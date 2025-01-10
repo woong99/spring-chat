@@ -83,3 +83,7 @@ kotlin {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// Google Drive에 Build 파일이 올라가지 않게 하기 위한 설정
+// TODO : Active Profile에 따른 분기 처리 필요
+layout.buildDirectory = file("../../spring-chat-build/")
