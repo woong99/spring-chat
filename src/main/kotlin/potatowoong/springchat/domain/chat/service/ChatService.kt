@@ -43,6 +43,7 @@ class ChatService(
         return member.nickname
     }
 
+    @Transactional(readOnly = true)
     fun getChatList(
         chatRoomId: String
     ): MessageDto.Response {
