@@ -1,11 +1,13 @@
 package potatowoong.springchat.domain.auth.service
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import potatowoong.springchat.domain.auth.dto.LoginDto
+import potatowoong.springchat.domain.auth.dto.MemberDto
 import potatowoong.springchat.domain.auth.dto.SignupDto
 import potatowoong.springchat.domain.auth.entity.Member
 import potatowoong.springchat.domain.auth.repository.MemberRepository
@@ -14,6 +16,7 @@ import potatowoong.springchat.global.auth.jwt.components.JwtTokenProvider
 import potatowoong.springchat.global.auth.jwt.dto.TokenDto
 import potatowoong.springchat.global.exception.CustomException
 import potatowoong.springchat.global.exception.ErrorCode
+import potatowoong.springchat.global.utils.SecurityUtils
 
 @Service
 class AuthService(
@@ -59,11 +62,19 @@ class AuthService(
 
         // Authentication 객체 생성
         val authentication = UsernamePasswordAuthenticationToken(
-            savedMember.userId,
+            savedMember.id,
             savedMember.password,
             listOf(Role.ROLE_USER).map { SimpleGrantedAuthority(it.name) }
         )
 
         return jwtTokenProvider.generateToken(authentication)
+    }
+
+    @Transactional(readOnly = true)
+    fun getMyInfo(): MemberDto {
+        return MemberDto.of(
+            memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
+                ?: throw CustomException(ErrorCode.UNAUTHORIZED)
+        )
     }
 }

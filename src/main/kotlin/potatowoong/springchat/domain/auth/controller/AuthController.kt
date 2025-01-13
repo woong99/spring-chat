@@ -2,11 +2,9 @@ package potatowoong.springchat.domain.auth.controller
 
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import potatowoong.springchat.domain.auth.dto.LoginDto
+import potatowoong.springchat.domain.auth.dto.MemberDto
 import potatowoong.springchat.domain.auth.dto.SignupDto
 import potatowoong.springchat.domain.auth.service.AuthService
 import potatowoong.springchat.global.auth.jwt.dto.TokenDto
@@ -38,5 +36,13 @@ class AuthController(
         @Valid @RequestBody request: LoginDto.Request
     ): ResponseEntity<ApiResponse<TokenDto>> {
         return ApiResponse.success(authService.login(request))
+    }
+
+    /**
+     * 내 정보 조회 API
+     */
+    @GetMapping("/me")
+    fun me(): ResponseEntity<ApiResponse<MemberDto>> {
+        return ApiResponse.success(authService.getMyInfo())
     }
 }
