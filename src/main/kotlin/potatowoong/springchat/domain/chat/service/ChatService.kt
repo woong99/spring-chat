@@ -52,7 +52,7 @@ class ChatService(
         }
 
         // 채팅 내역 조회
-        return chatRepository.findAllByChatRoomChatRoomIdOrderByCreatedAt(chatRoomId).map {
+        return chatRepository.findAllByChatRoomChatRoomIdOrderBySendAtDesc(chatRoomId).map {
             MessageDto.Response.of(it)
         }
     }
