@@ -51,6 +51,9 @@ dependencies {
     // Kotlin-Logging
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
 
+    // WebSocket
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
