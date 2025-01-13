@@ -1,31 +1,30 @@
 package potatowoong.springchat.global.config.socket
 
-import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.simp.stomp.StompCommand
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.messaging.support.ChannelInterceptor
+import org.springframework.messaging.support.MessageHeaderAccessor
 import org.springframework.security.core.Authentication
+import org.springframework.stereotype.Component
 import potatowoong.springchat.global.auth.jwt.components.JwtTokenProvider
 import potatowoong.springchat.global.exception.CustomException
 import potatowoong.springchat.global.exception.ErrorCode
 
-@Configuration
+@Component
 class StompInterceptor(
     private val jwtTokenProvider: JwtTokenProvider
 ) : ChannelInterceptor {
 
     override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
-        val accessor = StompHeaderAccessor.wrap(message)
+        val accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor::class.java)
 
         // CONNECT 메시지인 경우 토큰을 추출하여 인증 정보를 설정
-        if (accessor.command == StompCommand.CONNECT) {
-            val headerAccessor = StompHeaderAccessor.wrap(message)
-            val headers = headerAccessor.getNativeHeader("Authorization")
+        if (accessor?.command == StompCommand.CONNECT) {
+            val headers = accessor.getNativeHeader("Authorization")
 
-            headerAccessor.user = getAuthentication(headers)
-
+            accessor.user = getAuthentication(headers)
         }
         return super.preSend(message, channel)
     }
