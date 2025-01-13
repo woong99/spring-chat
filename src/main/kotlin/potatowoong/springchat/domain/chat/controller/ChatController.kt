@@ -18,15 +18,18 @@ class ChatController(
 ) {
     private val log = KotlinLogging.logger { }
 
-    @MessageMapping("/chat")
+    @MessageMapping("/chat/{id}")
     fun chat(
-        message: String,
+        request: MessageDto.Request,
         authentication: Authentication
     ) {
-        log.info { "message : $message, auth : ${authentication.name}" }
+        log.info { "message : $request, auth : ${authentication.name}" }
         val member = memberRepository.findByIdOrNull(authentication.name.toLong())
             ?: throw CustomException(ErrorCode.UNAUTHORIZED)
 
-        simpMessagingTemplate.convertAndSend("/sub/1", MessageDto.of(member.nickname, message))
+        simpMessagingTemplate.convertAndSend(
+            "/sub/${request.roomId}",
+            MessageDto.Response.of(member.nickname, request.message)
+        )
     }
 }
