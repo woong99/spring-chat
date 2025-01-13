@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsUtils
 import potatowoong.springchat.global.auth.jwt.components.JwtTokenProvider
 import potatowoong.springchat.global.auth.jwt.filter.JwtAuthenticationFilter
 import potatowoong.springchat.global.auth.jwt.handler.JwtAccessDeniedHandler
@@ -55,6 +56,7 @@ class SecurityConfig(
         http
             .authorizeHttpRequests {
                 it
+                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                     .requestMatchers(*PERMIT_ALL).permitAll()
                     .anyRequest().authenticated()
             }
@@ -79,7 +81,8 @@ class SecurityConfig(
         // 허용 URL
         private val PERMIT_ALL = arrayOf(
             "/api/v1/auth/sign-up",
-            "/api/v1/auth/login"
+            "/api/v1/auth/login",
+            "/ws-stomp/**"
         )
     }
 }
