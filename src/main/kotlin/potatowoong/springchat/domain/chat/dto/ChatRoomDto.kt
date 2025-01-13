@@ -1,7 +1,8 @@
 package potatowoong.springchat.domain.chat.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.constraints.NotBlank
-import potatowoong.springchat.domain.chat.entity.ChatRoom
+import java.time.LocalDateTime
 
 class ChatRoomDto {
 
@@ -12,15 +13,10 @@ class ChatRoomDto {
 
     data class Response(
         val chatRoomId: String,
-        val name: String
+        val name: String,
+        val lastChatMessage: String?,
+        @field:JsonIgnore val lastChatSendAtTime: LocalDateTime?
     ) {
-        companion object {
-            fun of(
-                chatRoom: ChatRoom
-            ) = Response(
-                chatRoomId = chatRoom.chatRoomId!!,
-                name = chatRoom.name
-            )
-        }
+        val lastChatSendAt: Long? = lastChatSendAtTime?.toInstant(java.time.ZoneOffset.ofHours(9))?.toEpochMilli()
     }
 }

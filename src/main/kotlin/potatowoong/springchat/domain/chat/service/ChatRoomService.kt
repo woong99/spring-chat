@@ -19,8 +19,6 @@ class ChatRoomService(
 
     @Transactional(readOnly = true)
     fun getChatRooms(): List<ChatRoomDto.Response> {
-        return chatRoomRepository.findAll().map {
-            ChatRoomDto.Response.of(it)
-        }
+        return chatRoomRepository.findChatRoomsWithLastChat()
     }
 }
