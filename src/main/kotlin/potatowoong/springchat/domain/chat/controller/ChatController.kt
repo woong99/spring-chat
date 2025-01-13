@@ -20,7 +20,7 @@ class ChatController(
     @GetMapping("/{chatRoomId}/messages")
     fun getChatList(
         @PathVariable chatRoomId: String
-    ): ResponseEntity<ApiResponse<List<MessageDto.Response>>> {
+    ): ResponseEntity<ApiResponse<MessageDto.Response>> {
         return ApiResponse.success(chatService.getChatList(chatRoomId))
     }
 }

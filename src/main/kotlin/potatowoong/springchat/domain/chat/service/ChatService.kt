@@ -45,15 +45,16 @@ class ChatService(
 
     fun getChatList(
         chatRoomId: String
-    ): List<MessageDto.Response> {
+    ): MessageDto.Response {
         // 채팅방 정보 조회
-        if (!chatRoomRepository.existsById(chatRoomId)) {
-            throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
-        }
+        val chatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
 
         // 채팅 내역 조회
-        return chatRepository.findAllByChatRoomChatRoomIdOrderBySendAtDesc(chatRoomId).map {
-            MessageDto.Response.of(it)
-        }
+        val messages = chatRepository.findAllByChatRoomChatRoomIdOrderBySendAtDesc(chatRoomId)
+        return MessageDto.Response.of(
+            chatRoomName = chatRoom.name,
+            messages = messages
+        )
     }
 }

@@ -37,7 +37,7 @@ class StompController(
         // 메시지 전송
         simpMessagingTemplate.convertAndSend(
             "/sub/${chatRoomId}",
-            MessageDto.Response.of(nickname, request.message)
+            MessageDto.Response.Message.of(nickname, request.message)
         )
     }
 

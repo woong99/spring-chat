@@ -9,27 +9,44 @@ class MessageDto {
     )
 
     data class Response(
-        val sender: String,
-        val message: String,
-        val sendAt: Long
+        val chatRoomName: String,
+        val messages: List<Message>
     ) {
         companion object {
             fun of(
-                sender: String,
-                message: String,
+                chatRoomName: String,
+                messages: List<Chat>
             ) = Response(
-                sender = sender,
-                message = message,
-                sendAt = System.currentTimeMillis()
+                chatRoomName = chatRoomName,
+                messages = messages.map {
+                    Message.of(it)
+                }
             )
+        }
 
-            fun of(
-                chat: Chat
-            ) = Response(
-                sender = chat.member.nickname,
-                message = chat.content,
-                sendAt = chat.sendAt.toInstant(ZoneOffset.ofHours(9)).toEpochMilli()
-            )
+        data class Message(
+            val sender: String,
+            val message: String,
+            val sendAt: Long
+        ) {
+            companion object {
+                fun of(
+                    sender: String,
+                    message: String,
+                ) = Message(
+                    sender = sender,
+                    message = message,
+                    sendAt = System.currentTimeMillis()
+                )
+
+                fun of(
+                    chat: Chat
+                ) = Message(
+                    sender = chat.member.nickname,
+                    message = chat.content,
+                    sendAt = chat.sendAt.toInstant(ZoneOffset.ofHours(9)).toEpochMilli()
+                )
+            }
         }
     }
 }
