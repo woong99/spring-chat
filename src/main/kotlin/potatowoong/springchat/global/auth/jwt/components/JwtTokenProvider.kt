@@ -130,3 +130,6 @@ class JwtTokenProvider(
         }
     }
 }
+
+//layout.buildDirectory = file("/Users/woong-gyojeong/Desktop/woong/spring-chat-build")
+//
