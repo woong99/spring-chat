@@ -1,35 +1,26 @@
 package potatowoong.springchat.domain.chat.controller
 
-import io.github.oshai.kotlinlogging.KotlinLogging
-import org.springframework.data.repository.findByIdOrNull
-import org.springframework.messaging.handler.annotation.MessageMapping
-import org.springframework.messaging.simp.SimpMessagingTemplate
-import org.springframework.security.core.Authentication
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import potatowoong.springchat.domain.auth.repository.MemberRepository
 import potatowoong.springchat.domain.chat.dto.MessageDto
-import potatowoong.springchat.global.exception.CustomException
-import potatowoong.springchat.global.exception.ErrorCode
+import potatowoong.springchat.domain.chat.service.ChatService
+import potatowoong.springchat.global.common.ApiResponse
 
 @RestController
+@RequestMapping("/api/v1/chat")
 class ChatController(
-    private val simpMessagingTemplate: SimpMessagingTemplate,
-    private val memberRepository: MemberRepository
+    private val chatService: ChatService,
 ) {
-    private val log = KotlinLogging.logger { }
-
-    @MessageMapping("/chat/{id}")
-    fun chat(
-        request: MessageDto.Request,
-        authentication: Authentication
-    ) {
-        log.info { "message : $request, auth : ${authentication.name}" }
-        val member = memberRepository.findByIdOrNull(authentication.name.toLong())
-            ?: throw CustomException(ErrorCode.UNAUTHORIZED)
-
-        simpMessagingTemplate.convertAndSend(
-            "/sub/${request.roomId}",
-            MessageDto.Response.of(member.nickname, request.message)
-        )
+    /**
+     * 채팅 내역 조회
+     */
+    @GetMapping("/{chatRoomId}/messages")
+    fun getChatList(
+        @PathVariable chatRoomId: String
+    ): ResponseEntity<ApiResponse<List<MessageDto.Response>>> {
+        return ApiResponse.success(chatService.getChatList(chatRoomId))
     }
 }

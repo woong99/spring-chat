@@ -71,9 +71,11 @@ class AuthService(
     }
 
     @Transactional(readOnly = true)
-    fun getMyInfo(): MemberDto {
+    fun getMyInfo(
+        memberId: Long? = SecurityUtils.getCurrentUserId()
+    ): MemberDto {
         return MemberDto.of(
-            memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
+            memberRepository.findByIdOrNull(memberId)
                 ?: throw CustomException(ErrorCode.UNAUTHORIZED)
         )
     }

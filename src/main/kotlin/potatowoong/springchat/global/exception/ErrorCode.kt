@@ -19,4 +19,6 @@ enum class ErrorCode(
     EXISTED_USER_ID(HttpStatus.BAD_REQUEST, "AU001", "이미 존재하는 아이디입니다."),
     EXISTED_NICKNAME(HttpStatus.BAD_REQUEST, "AU002", "이미 존재하는 닉네임입니다."),
     INCORRECT_ID_OR_PASSWORD(HttpStatus.BAD_REQUEST, "AU003", "아이디 또는 비밀번호가 일치하지 않습니다."),
+
+    NOT_FOUND_CHAT_ROOM(HttpStatus.NOT_FOUND, "CR001", "존재하지 않는 채팅방입니다."),
 }

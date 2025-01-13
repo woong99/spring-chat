@@ -11,14 +11,14 @@ class ChatRoomDto {
     )
 
     data class Response(
-        val id: String,
+        val chatRoomId: String,
         val name: String
     ) {
         companion object {
             fun of(
                 chatRoom: ChatRoom
             ) = Response(
-                id = chatRoom.id!!,
+                chatRoomId = chatRoom.chatRoomId!!,
                 name = chatRoom.name
             )
         }
