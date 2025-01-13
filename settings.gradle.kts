@@ -1,1 +1,1 @@
-rootProject.name = "spring-chat"
+rootProject.name = "spring-chat-backend"
