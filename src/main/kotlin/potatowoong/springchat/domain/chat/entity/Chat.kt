@@ -3,7 +3,7 @@ package potatowoong.springchat.domain.chat.entity
 import jakarta.persistence.*
 import potatowoong.springchat.domain.auth.entity.Member
 import potatowoong.springchat.domain.chat.dto.MessageDto
-import potatowoong.springchat.global.config.db.entity.BaseEntity
+import java.time.LocalDateTime
 
 @Entity
 class Chat(
@@ -20,8 +20,11 @@ class Chat(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
-    val chatRoom: ChatRoom
-) : BaseEntity() {
+    val chatRoom: ChatRoom,
+
+    @Column(nullable = false, updatable = false)
+    val sendAt: LocalDateTime
+) {
     companion object {
         fun of(
             request: MessageDto.Request,
@@ -30,7 +33,8 @@ class Chat(
         ) = Chat(
             content = request.message,
             member = member,
-            chatRoom = chatRoom
+            chatRoom = chatRoom,
+            sendAt = LocalDateTime.now()
         )
     }
 }

@@ -11,7 +11,7 @@ class MessageDto {
     data class Response(
         val sender: String,
         val message: String,
-        val createdAt: Long
+        val sendAt: Long
     ) {
         companion object {
             fun of(
@@ -20,7 +20,7 @@ class MessageDto {
             ) = Response(
                 sender = sender,
                 message = message,
-                createdAt = System.currentTimeMillis()
+                sendAt = System.currentTimeMillis()
             )
 
             fun of(
@@ -28,7 +28,7 @@ class MessageDto {
             ) = Response(
                 sender = chat.member.nickname,
                 message = chat.content,
-                createdAt = chat.createdAt.toInstant(ZoneOffset.UTC).toEpochMilli()
+                sendAt = chat.sendAt.toInstant(ZoneOffset.ofHours(9)).toEpochMilli()
             )
         }
     }
