@@ -3,27 +3,27 @@ package potatowoong.springchat.domain.chat.repository
 import com.querydsl.core.types.Projections
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.JPQLQueryFactory
-import potatowoong.springchat.domain.chat.dto.ChatRoomDto
+import potatowoong.springchat.domain.chat.dto.AllChatRoomsDto
+import potatowoong.springchat.domain.chat.dto.MyChatRoomsDto
 import potatowoong.springchat.domain.chat.entity.QChat.chat
 import potatowoong.springchat.domain.chat.entity.QChatRoom.chatRoom
 import potatowoong.springchat.domain.chat.entity.QChatRoomMember.chatRoomMember
+import potatowoong.springchat.global.utils.SecurityUtils
 
 class ChatRoomRepositoryCustomImpl(
     private val queryFactory: JPQLQueryFactory
 ) : ChatRoomRepositoryCustom {
 
-    override fun findChatRoomsWithLastChat(): List<ChatRoomDto.Response> {
+    override fun findAllChatRooms(): List<AllChatRoomsDto> {
         return queryFactory.select(
             Projections.constructor(
-                ChatRoomDto.Response::class.java,
+                AllChatRoomsDto::class.java,
                 chatRoom.chatRoomId,
                 chatRoom.name,
-                chat.content,
                 chat.sendAt,
                 chatRoomMember.count()
             )
-        )
-            .from(chatRoom)
+        ).from(chatRoom)
             .leftJoin(chat).on(
                 chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId).and(
                     chat.sendAt.eq(
@@ -38,4 +38,35 @@ class ChatRoomRepositoryCustomImpl(
             .orderBy(chat.sendAt.desc())
             .fetch()
     }
+
+    override fun findMyChatRooms(): List<MyChatRoomsDto> {
+        return queryFactory.select(
+            Projections.constructor(
+                MyChatRoomsDto::class.java,
+                chatRoom.chatRoomId,
+                chatRoom.name,
+                chat.sendAt,
+                chatRoomMember.count(),
+                chat.content
+            )
+        )
+            .from(chatRoom)
+            .leftJoin(chat).on(
+                chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId).and(
+                    chat.sendAt.eq(
+                        JPAExpressions.select(chat.sendAt.max())
+                            .from(chat)
+                            .where(chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId))
+                    )
+                )
+            )
+            .innerJoin(chatRoomMember).on(
+                chatRoomMember.chatRoom.chatRoomId.eq(chatRoom.chatRoomId)
+                    .and(chatRoomMember.member.id.eq(SecurityUtils.getCurrentUserId()))
+            )
+            .groupBy(chatRoom.chatRoomId)
+            .orderBy(chat.sendAt.desc())
+            .fetch()
+    }
+
 }

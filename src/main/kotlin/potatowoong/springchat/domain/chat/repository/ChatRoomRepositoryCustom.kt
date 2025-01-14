@@ -1,8 +1,11 @@
 package potatowoong.springchat.domain.chat.repository
 
-import potatowoong.springchat.domain.chat.dto.ChatRoomDto
+import potatowoong.springchat.domain.chat.dto.AllChatRoomsDto
+import potatowoong.springchat.domain.chat.dto.MyChatRoomsDto
 
 interface ChatRoomRepositoryCustom {
 
-    fun findChatRoomsWithLastChat(): List<ChatRoomDto.Response>
+    fun findAllChatRooms(): List<AllChatRoomsDto>
+
+    fun findMyChatRooms(): List<MyChatRoomsDto>
 }

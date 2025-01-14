@@ -4,7 +4,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import potatowoong.springchat.domain.auth.repository.MemberRepository
+import potatowoong.springchat.domain.chat.dto.AllChatRoomsDto
 import potatowoong.springchat.domain.chat.dto.ChatRoomDto
+import potatowoong.springchat.domain.chat.dto.MyChatRoomsDto
 import potatowoong.springchat.domain.chat.entity.ChatRoom
 import potatowoong.springchat.domain.chat.entity.ChatRoomMember
 import potatowoong.springchat.domain.chat.repository.ChatRoomMemberRepository
@@ -26,8 +28,13 @@ class ChatRoomService(
     }
 
     @Transactional(readOnly = true)
-    fun getChatRooms(): List<ChatRoomDto.Response> {
-        return chatRoomRepository.findChatRoomsWithLastChat()
+    fun getAllChatRooms(): List<AllChatRoomsDto> {
+        return chatRoomRepository.findAllChatRooms()
+    }
+
+    @Transactional(readOnly = true)
+    fun getMyChatRooms(): List<MyChatRoomsDto> {
+        return chatRoomRepository.findMyChatRooms()
     }
 
     @Transactional
