@@ -8,6 +8,7 @@ data class MyChatRoomsDto(
     val chatRoomName: String,
     @field:JsonIgnore val lastSendAtTime: LocalDateTime?,
     val participantCount: Long,
+    val unreadCount: Long,
     val lastChatMessage: String?
 ) {
     val lastSendAt: Long? = lastSendAtTime?.toInstant(java.time.ZoneOffset.ofHours(9))?.toEpochMilli()

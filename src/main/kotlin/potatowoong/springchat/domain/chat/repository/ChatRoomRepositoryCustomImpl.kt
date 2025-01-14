@@ -46,7 +46,15 @@ class ChatRoomRepositoryCustomImpl(
                 chatRoom.chatRoomId,
                 chatRoom.name,
                 chat.sendAt,
-                chatRoomMember.count(),
+                JPAExpressions.select(chatRoomMember.member.count())
+                    .from(chatRoomMember)
+                    .where(chatRoomMember.chatRoom.chatRoomId.eq(chatRoom.chatRoomId)),
+                JPAExpressions.select(chat.count())
+                    .from(chat)
+                    .where(
+                        chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId)
+                            .and(chat.sendAt.after(chatRoomMember.lastJoinedAt))
+                    ),
                 chat.content
             )
         )
@@ -64,9 +72,7 @@ class ChatRoomRepositoryCustomImpl(
                 chatRoomMember.chatRoom.chatRoomId.eq(chatRoom.chatRoomId)
                     .and(chatRoomMember.member.id.eq(SecurityUtils.getCurrentUserId()))
             )
-            .groupBy(chatRoom.chatRoomId)
             .orderBy(chat.sendAt.desc())
             .fetch()
     }
-
 }
