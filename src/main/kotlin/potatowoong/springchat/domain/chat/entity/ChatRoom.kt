@@ -14,7 +14,10 @@ class ChatRoom(
     var name: String,
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom")
-    val chats: List<Chat> = mutableListOf()
+    val chats: List<Chat> = mutableListOf(),
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom")
+    val chatRoomMembers: List<ChatRoomMember> = mutableListOf()
 ) : BaseEntity() {
     companion object {
         fun of(

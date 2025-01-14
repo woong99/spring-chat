@@ -2,15 +2,15 @@ package potatowoong.springchat.domain.chat.repository
 
 import com.querydsl.core.types.Projections
 import com.querydsl.jpa.JPAExpressions
-import com.querydsl.jpa.impl.JPAQueryFactory
+import com.querydsl.jpa.JPQLQueryFactory
 import potatowoong.springchat.domain.chat.dto.ChatRoomDto
 import potatowoong.springchat.domain.chat.entity.QChat.chat
 import potatowoong.springchat.domain.chat.entity.QChatRoom.chatRoom
 import potatowoong.springchat.domain.chat.entity.QChatRoomMember.chatRoomMember
 
-class ChatRepositoryCustomImpl(
-    private val queryFactory: JPAQueryFactory
-) : ChatRepositoryCustom {
+class ChatRoomRepositoryCustomImpl(
+    private val queryFactory: JPQLQueryFactory
+) : ChatRoomRepositoryCustom {
 
     override fun findChatRoomsWithLastChat(): List<ChatRoomDto.Response> {
         return queryFactory.select(

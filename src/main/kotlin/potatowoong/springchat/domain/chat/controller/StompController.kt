@@ -8,13 +8,15 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.RestController
 import potatowoong.springchat.domain.auth.service.AuthService
 import potatowoong.springchat.domain.chat.dto.MessageDto
+import potatowoong.springchat.domain.chat.service.ChatRoomNotificationService
 import potatowoong.springchat.domain.chat.service.ChatService
 
 @RestController
 class StompController(
     private val simpMessagingTemplate: SimpMessagingTemplate,
     private val chatService: ChatService,
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val chatRoomNotificationService: ChatRoomNotificationService
 ) {
     private val log = KotlinLogging.logger { }
 
@@ -39,6 +41,11 @@ class StompController(
             "/sub/${chatRoomId}",
             MessageDto.Response.Message.of(nickname, request.message)
         )
-    }
 
+        // 채팅방 실시간 갱신
+        chatRoomNotificationService.sendToClient(
+            chatRoomId,
+            request.message
+        )
+    }
 }
