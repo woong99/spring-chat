@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import potatowoong.springchat.domain.chat.dto.ChatRoomDto
 import potatowoong.springchat.domain.chat.entity.QChat.chat
 import potatowoong.springchat.domain.chat.entity.QChatRoom.chatRoom
+import potatowoong.springchat.domain.chat.entity.QChatRoomMember.chatRoomMember
 
 class ChatRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
@@ -18,7 +19,8 @@ class ChatRepositoryCustomImpl(
                 chatRoom.chatRoomId,
                 chatRoom.name,
                 chat.content,
-                chat.sendAt
+                chat.sendAt,
+                chatRoomMember.count()
             )
         )
             .from(chatRoom)
@@ -31,6 +33,9 @@ class ChatRepositoryCustomImpl(
                     )
                 )
             )
+            .leftJoin(chatRoomMember).on(chatRoomMember.chatRoom.chatRoomId.eq(chatRoom.chatRoomId))
+            .groupBy(chatRoom.chatRoomId)
+            .orderBy(chat.sendAt.desc())
             .fetch()
     }
 }
