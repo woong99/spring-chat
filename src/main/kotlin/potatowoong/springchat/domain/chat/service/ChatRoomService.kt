@@ -13,6 +13,7 @@ import potatowoong.springchat.domain.chat.repository.ChatRoomMemberRepository
 import potatowoong.springchat.domain.chat.repository.ChatRoomRepository
 import potatowoong.springchat.global.exception.CustomException
 import potatowoong.springchat.global.exception.ErrorCode
+import potatowoong.springchat.global.utils.SecurityUtils
 
 @Service
 class ChatRoomService(
@@ -24,7 +25,13 @@ class ChatRoomService(
     fun addChatRoom(
         request: ChatRoomDto.Request
     ) {
-        chatRoomRepository.save(ChatRoom.of(request))
+        // 사용자 정보 조회
+        val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
+            ?: throw CustomException(ErrorCode.UNAUTHORIZED)
+
+        // 채팅방 생성
+        val chatRoom = chatRoomRepository.save(ChatRoom.of(request))
+        chatRoomMemberRepository.save(ChatRoomMember.of(chatRoom, member))
     }
 
     @Transactional(readOnly = true)
