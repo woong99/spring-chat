@@ -7,6 +7,7 @@ import potatowoong.springchat.domain.auth.repository.MemberRepository
 import potatowoong.springchat.domain.chat.dto.MessageDto
 import potatowoong.springchat.domain.chat.entity.Chat
 import potatowoong.springchat.domain.chat.repository.ChatRepository
+import potatowoong.springchat.domain.chat.repository.ChatRoomMemberRepository
 import potatowoong.springchat.domain.chat.repository.ChatRoomRepository
 import potatowoong.springchat.global.exception.CustomException
 import potatowoong.springchat.global.exception.ErrorCode
@@ -15,7 +16,8 @@ import potatowoong.springchat.global.exception.ErrorCode
 class ChatService(
     private val chatRepository: ChatRepository,
     private val memberRepository: MemberRepository,
-    private val chatRoomRepository: ChatRoomRepository
+    private val chatRoomRepository: ChatRoomRepository,
+    private val chatRoomMemberRepository: ChatRoomMemberRepository
 ) {
     @Transactional
     fun saveChat(
@@ -39,6 +41,11 @@ class ChatService(
                 chatRoom = chatRoom
             )
         )
+
+        // 마지막 접속 시간 갱신
+        val chatRoomMember = chatRoomMemberRepository.findByChatRoomChatRoomIdAndMemberId(chatRoomId, memberId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
+        chatRoomMember.updateLastJoinedAt()
 
         return member.nickname
     }
