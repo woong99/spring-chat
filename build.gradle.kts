@@ -95,7 +95,25 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-// Google Drive에 Build 파일이 올라가지 않게 하기 위한 설정
-// TODO : Active Profile에 따른 분기 처리 필요
-layout.buildDirectory = file("/Users/woong-gyojeong/Desktop/woong/spring-chat-build")
+// 환경별 설정 파일을 사용하기 위한 설정
+val profile: String by project
+val activeProfile = if (!project.hasProperty("profile") || profile.isEmpty()) "local" else profile
+project.ext.set("profile", activeProfile)
 
+sourceSets {
+    main {
+        resources {
+            setSrcDirs(listOf("src/main/resources", "src/main/resources-$activeProfile"))
+        }
+    }
+}
+
+tasks {
+    processResources {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+        filesMatching("**/application.yaml") {
+            expand(project.properties)
+        }
+    }
+}

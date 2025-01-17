@@ -1,0 +1,15 @@
+spring:
+    config:
+        activate:
+            on-profile: test
+    datasource:
+        driver-class-name: org.mariadb.jdbc.Driver
+        url: jdbc:mariadb://spring-10k-chat-mariadb:3306/spring_chat
+        username: root
+        password: 1234
+        p6spy:
+            enabled: false
+    jpa:
+        properties:
+            hibernate:
+                show_sql: false
