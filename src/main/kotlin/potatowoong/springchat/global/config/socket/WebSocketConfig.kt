@@ -24,6 +24,9 @@ class WebSocketConfig(
             .setAllowedOriginPatterns("*") // TODO : 배포 시 변경
             .withSockJS()
 
+        registry.addEndpoint("/ws-stomp")
+            .setAllowedOriginPatterns("*") // TODO : 배포 시 변경
+
         registry.setErrorHandler(stompErrorHandler)
     }
 
