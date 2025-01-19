@@ -1,0 +1,62 @@
+services:
+    mariadb:
+        image: mariadb:11.4
+        container_name: mariadb_11.4
+        ports:
+            - "13300:3306"
+        volumes:
+            - ./data/mariadb/conf.d:/etc/mysql/conf.d
+            - ./data/mariadb/data:/var/lib/mysql
+            - ./data/mariadb/initdb.d:/docker-entrypoint-initdb.d
+        environment:
+            TZ: Asia/Seoul
+            MYSQL_HOST: localhost
+            MYSQL_PORT: 3306
+            MYSQL_ROOT_PASSWORD: 1234
+            MYSQL_DATABASE: spring_chat
+            MYSQL_USER: root
+            MYSQL_PASSWORD: 1234
+        networks:
+            spring-10k-chat-network:
+                aliases:
+                    - spring-10k-chat-mariadb
+        deploy:
+            resources:
+                limits:
+                    cpus: '2'
+                    memory: '1024M'
+
+    spring-10k-chat-server:
+        image: spring-10k-chat-server
+        container_name: spring-10k-chat-server
+        ports:
+            - "13301:8080"
+        volumes:
+            - ./jar:/opt/app
+        networks:
+            - spring-10k-chat-network
+        deploy:
+            resources:
+                limits:
+                    cpus: '2'
+                    memory: '1024M'
+        depends_on:
+            - mariadb
+
+    cadvisor:
+        image: gcr.io/cadvisor/cadvisor
+        container_name: cadvisor
+        ports:
+            - "13304:8080"
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+            - /dev/disk/:/dev/disk:ro
+        networks:
+            - spring-10k-chat-network
+
+networks:
+    spring-10k-chat-network:
+        external: true
