@@ -344,3 +344,7 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/gradle,kotlin,macos,windows,intellij,intellij+iml,intellij+all
 .tmp.drivedownload/
 .tmp.driveupload
+
+/docker/mariadb/**
+/docker/monitoring/grafana
+/docker/monitoring/prometheus
