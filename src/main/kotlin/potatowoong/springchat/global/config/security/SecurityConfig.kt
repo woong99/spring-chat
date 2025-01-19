@@ -84,6 +84,7 @@ class SecurityConfig(
             "/api/v1/auth/login",
             "/ws-stomp/**",
             "/actuator/prometheus",
+            "/actuator/health",
             "/metrics"
         )
     }
