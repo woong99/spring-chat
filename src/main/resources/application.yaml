@@ -6,6 +6,11 @@ spring:
     jpa:
         hibernate:
             ddl-auto: update
+management:
+    endpoints:
+        web:
+            exposure:
+                include: "*"
 jwt:
     secret: yQ3dMfYIsS4f4D8/5bNSmH4G3u0shPhiZa4NUsuQh1E=
     token-expiration: 180000

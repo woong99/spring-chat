@@ -79,6 +79,10 @@ dependencies {
     // MariaDB
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
+    // Monitoring
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
