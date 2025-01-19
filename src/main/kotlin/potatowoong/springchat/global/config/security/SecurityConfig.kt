@@ -82,7 +82,9 @@ class SecurityConfig(
         private val PERMIT_ALL = arrayOf(
             "/api/v1/auth/sign-up",
             "/api/v1/auth/login",
-            "/ws-stomp/**"
+            "/ws-stomp/**",
+            "/actuator/prometheus",
+            "/metrics"
         )
     }
 }
