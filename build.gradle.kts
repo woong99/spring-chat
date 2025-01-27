@@ -79,6 +79,12 @@ dependencies {
     // MariaDB
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
+    // RabbitMQ
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+
+    // Reactor-Netty
+    implementation("org.springframework.boot:spring-boot-starter-reactor-netty")
+
     // Monitoring
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")

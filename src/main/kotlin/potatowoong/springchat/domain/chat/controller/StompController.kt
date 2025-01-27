@@ -1,9 +1,8 @@
 package potatowoong.springchat.domain.chat.controller
 
-import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.RestController
 import potatowoong.springchat.domain.auth.service.AuthService
@@ -13,14 +12,13 @@ import potatowoong.springchat.domain.chat.service.ChatService
 
 @RestController
 class StompController(
-    private val simpMessagingTemplate: SimpMessagingTemplate,
+    private val rabbitTemplate: RabbitTemplate,
     private val chatService: ChatService,
     private val authService: AuthService,
-    private val chatRoomNotificationService: ChatRoomNotificationService
+    private val chatRoomNotificationService: ChatRoomNotificationService,
 ) {
-    private val log = KotlinLogging.logger { }
-
-    @MessageMapping("/chat/{chatRoomId}")
+    
+    @MessageMapping("chat.message.{chatRoomId}")
     fun chat(
         @DestinationVariable chatRoomId: String,
         request: MessageDto.Request,
@@ -37,8 +35,9 @@ class StompController(
         )
 
         // 메시지 전송
-        simpMessagingTemplate.convertAndSend(
-            "/sub/${chatRoomId}",
+        rabbitTemplate.convertAndSend(
+            "chat.exchange",
+            "chat.room.${chatRoomId}",
             MessageDto.Response.Message.of(nickname, request.message)
         )
 
