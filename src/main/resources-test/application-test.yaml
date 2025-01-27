@@ -19,3 +19,5 @@ spring:
         host: rabbitmq
         port: 5672
         stomp-port: 61613
+notification:
+    queue-number: ${NOTIFICATION_QUEUE_NUMBER}

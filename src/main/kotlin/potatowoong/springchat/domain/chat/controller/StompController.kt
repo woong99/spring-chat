@@ -1,5 +1,6 @@
 package potatowoong.springchat.domain.chat.controller
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -9,6 +10,7 @@ import potatowoong.springchat.domain.auth.service.AuthService
 import potatowoong.springchat.domain.chat.dto.MessageDto
 import potatowoong.springchat.domain.chat.service.ChatRoomNotificationService
 import potatowoong.springchat.domain.chat.service.ChatService
+import potatowoong.springchat.domain.notification.dto.NotificationDto
 
 @RestController
 class StompController(
@@ -42,9 +44,13 @@ class StompController(
         )
 
         // 채팅방 실시간 갱신
-        chatRoomNotificationService.sendToClient(
-            chatRoomId,
-            request.message
+        rabbitTemplate.convertAndSend(
+            "notification.exchange",
+            "notification",
+            NotificationDto.of(
+                chatRoomId,
+                request.message
+            )
         )
     }
 }

@@ -3,10 +3,7 @@ package potatowoong.springchat.global.config.socket
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import org.springframework.amqp.core.Binding
-import org.springframework.amqp.core.BindingBuilder
-import org.springframework.amqp.core.Queue
-import org.springframework.amqp.core.TopicExchange
+import org.springframework.amqp.core.*
 import org.springframework.amqp.rabbit.annotation.EnableRabbit
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
@@ -25,26 +22,46 @@ class RabbitConfig(
     @Value("\${spring.rabbitmq.password}") private val password: String,
     @Value("\${spring.rabbitmq.host}") private val host: String,
     @Value("\${spring.rabbitmq.port}") private val port: Int,
+    @Value("\${notification.queue-number}") private val notificationQueueNumber: Int
 ) {
 
-    // Queue 등록
+    // Chat Queue 등록
     @Bean
-    fun queue() = Queue(CHAT_QUEUE_NAME, true)
+    fun chatQueue() = Queue(CHAT_QUEUE_NAME, true)
 
-    // Exchange 등록
+    // Notification Queue 등록
     @Bean
-    fun exchange(): TopicExchange {
+    fun notificationQueue() = Queue("$NOTIFICATION_QUEUE_NAME.$notificationQueueNumber", true)
+
+    // Chat Exchange 등록
+    @Bean
+    fun chatExchange(): TopicExchange {
         return TopicExchange(CHAT_EXCHANGE_NAME, true, false)
     }
 
-    // Binding 등록
+    // Notification Exchange 등록
     @Bean
-    fun binding(
-        queue: Queue,
-        exchange: TopicExchange
-    ): Binding = BindingBuilder.bind(queue)
-        .to(exchange)
-        .with(ROUTING_KEY)
+    fun notificationExchange(): DirectExchange {
+        return DirectExchange(NOTIFICATION_EXCHANGE_NAME, true, false)
+    }
+
+    // Chat Binding 등록
+    @Bean
+    fun chatBinding(
+        chatQueue: Queue,
+        chatExchange: TopicExchange
+    ): Binding = BindingBuilder.bind(chatQueue)
+        .to(chatExchange)
+        .with(CHAT_ROUTING_KEY)
+
+    // Notification Binding 등록
+    @Bean
+    fun notificationBinding(
+        notificationQueue: Queue,
+        notificationExchange: DirectExchange
+    ): Binding = BindingBuilder.bind(notificationQueue)
+        .to(notificationExchange)
+        .with(NOTIFICATION_ROUTING_KEY)
 
     // ConnectionFactory 등록
     @Bean
@@ -63,7 +80,7 @@ class RabbitConfig(
     fun rabbitTemplate(): RabbitTemplate {
         val rabbitTemplate = RabbitTemplate(connectionFactory())
         rabbitTemplate.messageConverter = messageConverter()
-        rabbitTemplate.routingKey = ROUTING_KEY
+        rabbitTemplate.routingKey = CHAT_ROUTING_KEY
 
         return rabbitTemplate
     }
@@ -96,6 +113,9 @@ class RabbitConfig(
     companion object {
         private const val CHAT_QUEUE_NAME = "chat.queue"
         private const val CHAT_EXCHANGE_NAME = "chat.exchange"
-        private const val ROUTING_KEY = "room.*"
+        private const val CHAT_ROUTING_KEY = "room.*"
+        private const val NOTIFICATION_EXCHANGE_NAME = "notification.exchange"
+        private const val NOTIFICATION_QUEUE_NAME = "notification.queue"
+        private const val NOTIFICATION_ROUTING_KEY = "notification"
     }
 }

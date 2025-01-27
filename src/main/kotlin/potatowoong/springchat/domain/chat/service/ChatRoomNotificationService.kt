@@ -7,6 +7,7 @@ import potatowoong.springchat.domain.chat.dto.UnreadMessageCountDto
 import potatowoong.springchat.domain.chat.repository.ChatRepository
 import potatowoong.springchat.domain.chat.repository.ChatRoomRepository
 import potatowoong.springchat.global.utils.SecurityUtils
+import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class ChatRoomNotificationService(
@@ -16,7 +17,7 @@ class ChatRoomNotificationService(
 
     private val log = KotlinLogging.logger { }
 
-    private val emitters: MutableMap<Long, SseEmitter> = mutableMapOf()
+    private val emitters: MutableMap<Long, SseEmitter> = ConcurrentHashMap()
 
     fun subscribe(): SseEmitter {
         val emitter = SseEmitter(1000 * 60 * 10)
