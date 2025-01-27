@@ -26,6 +26,23 @@ services:
                     cpus: '2'
                     memory: '1024M'
 
+    rabbitmq:
+        image: rabbitmq:management-alpine
+        container_name: rabbitmq
+        volumes:
+            - ./rabbitmq/etc/:/etc/rabbitmq/
+            - ./rabbitmq/data/:/var/lib/rabbitmq/
+            - ./rabbitmq/logs/:/var/log/rabbitmq/
+        ports:
+            - "5672:5672" # AMQP
+            - "15672:15672" # Web UI
+            - "61613:61613" # STOMP
+        environment:
+            RABBITMQ_DEFAULT_USER: admin
+            RABBITMQ_DEFAULT_PASS: 1234
+        networks:
+            - spring-10k-chat-network
+
     spring-10k-chat-server:
         image: spring-10k-chat-server
         container_name: spring-10k-chat-server
@@ -42,20 +59,6 @@ services:
                     memory: '1024M'
         depends_on:
             - mariadb
-
-    cadvisor:
-        image: gcr.io/cadvisor/cadvisor
-        container_name: cadvisor
-        ports:
-            - "13304:8080"
-        volumes:
-            - /:/rootfs:ro
-            - /var/run:/var/run:rw
-            - /sys:/sys:ro
-            - /var/lib/docker/:/var/lib/docker:ro
-            - /dev/disk/:/dev/disk:ro
-        networks:
-            - spring-10k-chat-network
 
 networks:
     spring-10k-chat-network:
