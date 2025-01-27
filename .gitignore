@@ -346,5 +346,7 @@ gradle-app.setting
 .tmp.driveupload
 
 /docker/mariadb/**
+/docker/data/mariadb/**
 /docker/monitoring/grafana
-/docker/monitoring/prometheus
+/docker/monitoring/prometheus/data
+/docker/rabbitmq/**
