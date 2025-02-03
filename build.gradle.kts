@@ -87,6 +87,7 @@ dependencies {
 
     // Monitoring
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("pl.tkowalcz.tjahzi:log4j2-appender:0.9.32")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     // Test

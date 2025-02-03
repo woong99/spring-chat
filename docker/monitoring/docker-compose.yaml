@@ -42,6 +42,37 @@ volumes:
     prometheus-data:
     grafana-data:
 
+    node-exporter:
+        image: prom/node-exporter:latest
+        container_name: node-exporter
+        ports:
+            - "9100:9100"
+        restart: always
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command:
+            - '--path.procfs=/host/proc'
+            - '--path.rootfs=/rootfs'
+            - '--path.sysfs=/host/sys'
+            - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+        networks:
+            - spring-10k-chat-network
+
+    loki:
+        image: grafana/loki:latest
+        container_name: loki
+        ports:
+            - "3100:3100"
+        restart: always
+        command: -config.file=/etc/loki/local-config.yaml
+        volumes:
+            - /containers/data/loki/data:/loki
+            - /containers/data/loki/config/loki-config.yaml:/etc/loki/loki-config.yaml
+        networks:
+            - spring-10k-chat-network
+
 networks:
     monitoring:
         external: true
