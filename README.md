@@ -61,7 +61,7 @@
 
 ### v1.1
 
-- Prometheus, Grafana를 이용한 모니터링 구축
+- Prometheus, Grafana, Loki를 이용한 모니터링 구축
 - 부하 테스트를 위한 K6 스크립트 작성
 
 ### v2.0
