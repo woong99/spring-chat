@@ -11,6 +11,10 @@
             <AppenderRef ref="console"/>
         </Logger>
 
+        <Logger additivity="false" level="DEBUG" name="org.springframework.data.mongodb.core.MongoTemplate">
+            <AppenderRef ref="console"/>
+        </Logger>
+
         <Root level="INFO">
             <AppenderRef ref="console"/>
         </Root>

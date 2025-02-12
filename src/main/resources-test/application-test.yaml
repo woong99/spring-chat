@@ -9,6 +9,9 @@ spring:
         password: 1234
         p6spy:
             enabled: false
+    data:
+        mongodb:
+            uri: mongodb://root:root!))$@mongodb:27017/spring_chat?authSource=admin
     jpa:
         properties:
             hibernate:
