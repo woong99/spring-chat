@@ -45,6 +45,10 @@
 <br>
 <br>
 <details>
+<summary>v1.5 인프라</summary>
+<img src="./assets/infra-v1.5.png" alt="인프라">
+</details>
+<details>
 <summary>v1.1 인프라</summary>
 <img src="./assets/infra-v1.1.png" alt="인프라">
 </details>
