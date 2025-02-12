@@ -6,7 +6,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.RestController
-import potatowoong.springchat.domain.auth.service.AuthService
+import potatowoong.springchat.domain.auth.data.CustomUserDetails
 import potatowoong.springchat.domain.chat.dto.MessageDto
 import potatowoong.springchat.domain.chat.service.ChatRoomNotificationService
 import potatowoong.springchat.domain.chat.service.ChatService
@@ -15,7 +15,6 @@ import potatowoong.springchat.domain.chat.service.ChatService
 class StompController(
     private val simpMessagingTemplate: SimpMessagingTemplate,
     private val chatService: ChatService,
-    private val authService: AuthService,
     private val chatRoomNotificationService: ChatRoomNotificationService
 ) {
     private val log = KotlinLogging.logger { }
@@ -26,20 +25,23 @@ class StompController(
         request: MessageDto.Request,
         authentication: Authentication
     ) {
-        // 닉네임 조회
-        val nickname = authService.getMyInfo(authentication.name.toLong()).nickname
+        // 인증 정보
+        val userDetails = authentication.principal as CustomUserDetails
 
         // 채팅 저장
         chatService.saveChat(
             chatRoomId,
             request,
-            authentication.name.toLong()
+            userDetails.id
         )
 
         // 메시지 전송
         simpMessagingTemplate.convertAndSend(
             "/sub/${chatRoomId}",
-            MessageDto.Response.Message.of(nickname, request.message)
+            MessageDto.Response.Message.of(
+                userDetails = userDetails,
+                message = request.message
+            )
         )
 
         // 채팅방 실시간 갱신

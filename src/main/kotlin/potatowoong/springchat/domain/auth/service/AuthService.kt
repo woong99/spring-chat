@@ -67,7 +67,7 @@ class AuthService(
             listOf(Role.ROLE_USER).map { SimpleGrantedAuthority(it.name) }
         )
 
-        return jwtTokenProvider.generateToken(authentication)
+        return jwtTokenProvider.generateToken(authentication, savedMember.nickname)
     }
 
     @Transactional(readOnly = true)
