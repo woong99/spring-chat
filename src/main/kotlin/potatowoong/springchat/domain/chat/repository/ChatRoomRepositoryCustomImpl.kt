@@ -5,7 +5,6 @@ import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.JPQLQueryFactory
 import potatowoong.springchat.domain.chat.dto.AllChatRoomsDto
 import potatowoong.springchat.domain.chat.dto.MyChatRoomsDto
-import potatowoong.springchat.domain.chat.entity.QChat.chat
 import potatowoong.springchat.domain.chat.entity.QChatRoom.chatRoom
 import potatowoong.springchat.domain.chat.entity.QChatRoomMember.chatRoomMember
 import potatowoong.springchat.global.utils.SecurityUtils
@@ -20,22 +19,11 @@ class ChatRoomRepositoryCustomImpl(
                 AllChatRoomsDto::class.java,
                 chatRoom.chatRoomId,
                 chatRoom.name,
-                chat.sendAt,
-                chatRoomMember.count()
+                chatRoomMember.count(),
             )
         ).from(chatRoom)
-            .leftJoin(chat).on(
-                chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId).and(
-                    chat.sendAt.eq(
-                        JPAExpressions.select(chat.sendAt.max())
-                            .from(chat)
-                            .where(chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId))
-                    )
-                )
-            )
             .leftJoin(chatRoomMember).on(chatRoomMember.chatRoom.chatRoomId.eq(chatRoom.chatRoomId))
             .groupBy(chatRoom.chatRoomId)
-            .orderBy(chat.sendAt.desc())
             .fetch()
     }
 
@@ -45,34 +33,17 @@ class ChatRoomRepositoryCustomImpl(
                 MyChatRoomsDto::class.java,
                 chatRoom.chatRoomId,
                 chatRoom.name,
-                chat.sendAt,
+                chatRoomMember.lastJoinedAt,
                 JPAExpressions.select(chatRoomMember.member.count())
                     .from(chatRoomMember)
                     .where(chatRoomMember.chatRoom.chatRoomId.eq(chatRoom.chatRoomId)),
-                JPAExpressions.select(chat.count())
-                    .from(chat)
-                    .where(
-                        chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId)
-                            .and(chat.sendAt.after(chatRoomMember.lastJoinedAt))
-                    ),
-                chat.content
             )
         )
             .from(chatRoom)
-            .leftJoin(chat).on(
-                chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId).and(
-                    chat.sendAt.eq(
-                        JPAExpressions.select(chat.sendAt.max())
-                            .from(chat)
-                            .where(chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId))
-                    )
-                )
-            )
             .innerJoin(chatRoomMember).on(
                 chatRoomMember.chatRoom.chatRoomId.eq(chatRoom.chatRoomId)
                     .and(chatRoomMember.member.id.eq(SecurityUtils.getCurrentUserId()))
             )
-            .orderBy(chat.sendAt.desc())
             .fetch()
     }
 }

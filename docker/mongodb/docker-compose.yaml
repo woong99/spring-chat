@@ -1,0 +1,13 @@
+services:
+    mongodb:
+        image: mongo:latest
+        container_name: mongodb
+        restart: always
+        ports:
+            - "27017:27017"
+        volumes:
+            - /containers/data/mongodb:/data/db
+        environment:
+            TZ: Asia/Seoul
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: root!))$

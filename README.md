@@ -13,7 +13,7 @@
 
 - Language: Kotlin 1.9.25
 - Framework: Spring Boot 3.4.1
-- DB: MariaDB
+- DB: MariaDB, MongoDB
 - ORM: JPA, Querydsl
 - WebSocket, STOMP
 - Message Broker: RabbitMQ
@@ -64,8 +64,12 @@
 - Prometheus, Grafana, Loki를 이용한 모니터링 구축
 - Go 언어를 이용한 Stomp 부하 테스트 클라이언트 구현
 
+### v1.5
+
+- Nginx를 이용한 로드밸런싱 구축
+- MongoDB를 이용한 채팅 메시지 저장
+
 ### v2.0
 
 - RabbitMQ 연동
 - 실시간 채팅 알림을 위한 SSE 서버 이중화 대응
-

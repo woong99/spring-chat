@@ -7,6 +7,14 @@ spring:
         url: jdbc:mariadb://localhost:33306/spring_chat
         username: root
         password: 1234
+    data:
+        mongodb:
+            host: localhost
+            port: 27017
+            database: spring_chat
+            username: root
+            password: root!))$
+            authentication-database: admin
     rabbitmq:
         username: admin
         password: 1234

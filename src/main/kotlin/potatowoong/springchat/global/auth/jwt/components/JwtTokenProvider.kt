@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
+import potatowoong.springchat.domain.auth.data.CustomUserDetails
 import potatowoong.springchat.global.auth.jwt.dto.TokenDto
 import potatowoong.springchat.global.exception.CustomException
 import potatowoong.springchat.global.exception.ErrorCode
@@ -29,7 +29,8 @@ class JwtTokenProvider(
      * Access Token, Refresh Token 생성
      */
     fun generateToken(
-        authentication: Authentication
+        authentication: Authentication,
+        nickname: String
     ): TokenDto {
         val authorities = authentication.authorities.joinToString(",") {
             it.authority
@@ -44,6 +45,7 @@ class JwtTokenProvider(
         val accessToken = Jwts.builder()
             .subject(authentication.name)
             .claim("auth", authorities)
+            .claim("nickname", nickname)
             .expiration(accessTokenExpiresIn)
             .signWith(getSigningKey(), SIG.HS256)
             .compact()
@@ -62,7 +64,7 @@ class JwtTokenProvider(
     ): Authentication {
         // 토큰 복호화
         val claims = parseClaims(accessToken)
-        if (claims["auth"] == null) {
+        if (claims["auth"] == null || claims["nickname"] == null) {
             throw CustomException(ErrorCode.INVALID_ACCESS_TOKEN)
         }
 
@@ -73,9 +75,9 @@ class JwtTokenProvider(
                 SimpleGrantedAuthority(it)
             }
 
-        val principal = User(
-            claims.subject,
-            "",
+        val principal = CustomUserDetails(
+            claims.subject.toLong(),
+            claims["nickname"].toString(),
             authorities
         )
         return UsernamePasswordAuthenticationToken(principal, "", authorities)
