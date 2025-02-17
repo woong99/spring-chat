@@ -1,6 +1,7 @@
 package potatowoong.springchat.domain.chat.controller
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.security.core.Authentication
@@ -8,15 +9,16 @@ import org.springframework.web.bind.annotation.RestController
 import potatowoong.springchat.domain.auth.data.CustomUserDetails
 import potatowoong.springchat.domain.chat.dto.MessageDto
 import potatowoong.springchat.domain.chat.service.ChatService
-import potatowoong.springchat.domain.notification.dto.NotificationDto
+import potatowoong.springchat.global.config.kafka.KafkaConstants
 
 @RestController
 class StompController(
-    private val rabbitTemplate: RabbitTemplate,
+    private val kafkaTemplate: KafkaTemplate<String, Any>,
     private val chatService: ChatService,
+    private val objectMapper: ObjectMapper
 ) {
 
-    @MessageMapping("chat.message.{chatRoomId}")
+    @MessageMapping("/chat/{chatRoomId}")
     fun chat(
         @DestinationVariable chatRoomId: String,
         request: MessageDto.Request,
@@ -33,22 +35,14 @@ class StompController(
         )
 
         // 메시지 전송
-        rabbitTemplate.convertAndSend(
-            "chat.exchange",
-            "chat.room.${chatRoomId}",
-            MessageDto.Response.Message.of(
-                userDetails = userDetails,
-                message = request.message
-            )
-        )
-
-        // 채팅방 실시간 갱신
-        rabbitTemplate.convertAndSend(
-            "notification.exchange",
-            "notification",
-            NotificationDto.of(
-                chatRoomId,
-                request.message
+        kafkaTemplate.send(
+            KafkaConstants.CHAT_TOPIC,
+            objectMapper.writeValueAsString(
+                MessageDto.Message.of(
+                    userDetails = userDetails,
+                    message = request.message,
+                    chatRoomId = chatRoomId
+                )
             )
         )
     }

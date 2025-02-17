@@ -4,6 +4,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import potatowoong.springchat.domain.auth.repository.MemberRepository
+import potatowoong.springchat.domain.chat.dto.ChatDto
 import potatowoong.springchat.domain.chat.dto.MessageDto
 import potatowoong.springchat.domain.chat.entity.ChatMessage
 import potatowoong.springchat.domain.chat.repository.ChatMessageRepository
@@ -47,7 +48,7 @@ class ChatService(
     @Transactional(readOnly = true)
     fun getChatList(
         chatRoomId: String
-    ): MessageDto.Response {
+    ): ChatDto.Response {
         // 채팅방 정보 조회
         val chatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
             ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
@@ -60,7 +61,7 @@ class ChatService(
         val nicknameMap = memberRepository.findByIdIn(memberIds)
             .associate { it.id!! to it.nickname }
 
-        return MessageDto.Response.of(
+        return ChatDto.Response.of(
             chatRoomName = chatRoom.name,
             nicknameMap = nicknameMap,
             messages = messages

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import potatowoong.springchat.domain.chat.dto.MessageDto
+import potatowoong.springchat.domain.chat.dto.ChatDto
 import potatowoong.springchat.domain.chat.service.ChatService
 import potatowoong.springchat.global.common.ApiResponse
 
@@ -20,7 +20,7 @@ class ChatController(
     @GetMapping("/{chatRoomId}/messages")
     fun getChatList(
         @PathVariable chatRoomId: String
-    ): ResponseEntity<ApiResponse<MessageDto.Response>> {
+    ): ResponseEntity<ApiResponse<ChatDto.Response>> {
         return ApiResponse.success(chatService.getChatList(chatRoomId))
     }
 }
