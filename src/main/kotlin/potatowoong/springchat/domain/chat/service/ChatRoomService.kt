@@ -81,9 +81,8 @@ class ChatRoomService(
             }
         }
 
-        // 정렬 (안 읽은 메시지가 많은 순, 마지막 메시지 전송 일시가 늦은 순)
-        val (unreadRooms, readRooms) = chatRooms.partition { it.unreadCount > 0 }
-        return unreadRooms.sortedByDescending { it.lastSendAt } + readRooms.sortedByDescending { it.lastSendAt }
+        // 정렬 - 마지막 메시지 전송 일시가 늦은 순
+        return chatRooms.sortedByDescending { it.lastSendAt }
     }
 
     @Transactional
