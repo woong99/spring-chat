@@ -47,14 +47,15 @@ class ChatService(
 
     @Transactional(readOnly = true)
     fun getChatList(
-        chatRoomId: String
+        chatRoomId: String,
+        page: Long
     ): ChatDto.Response {
         // 채팅방 정보 조회
         val chatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
             ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
 
         // 채팅 내역 조회
-        val messages = chatMessageRepository.findAllByChatRoomIdOrderByIdDesc(chatRoomId)
+        val messages = chatMessageRepository.findMessagesWithPaging(chatRoomId, page)
 
         // 채팅방에 속한 멤버들의 닉네임 조회
         val memberIds = messages.map { it.memberId }.distinct()

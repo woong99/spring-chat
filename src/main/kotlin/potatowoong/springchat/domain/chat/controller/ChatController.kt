@@ -1,10 +1,7 @@
 package potatowoong.springchat.domain.chat.controller
 
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import potatowoong.springchat.domain.chat.dto.ChatDto
 import potatowoong.springchat.domain.chat.service.ChatService
 import potatowoong.springchat.global.common.ApiResponse
@@ -19,8 +16,9 @@ class ChatController(
      */
     @GetMapping("/{chatRoomId}/messages")
     fun getChatList(
-        @PathVariable chatRoomId: String
+        @PathVariable chatRoomId: String,
+        @RequestParam("page", defaultValue = "0") page: Long
     ): ResponseEntity<ApiResponse<ChatDto.Response>> {
-        return ApiResponse.success(chatService.getChatList(chatRoomId))
+        return ApiResponse.success(chatService.getChatList(chatRoomId, page))
     }
 }

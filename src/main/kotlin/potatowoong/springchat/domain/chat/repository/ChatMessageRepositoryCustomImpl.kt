@@ -4,6 +4,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
 import potatowoong.springchat.domain.chat.dto.LastMessageDto
 import potatowoong.springchat.domain.chat.dto.MyChatRoomsDto
 import potatowoong.springchat.domain.chat.entity.ChatMessage
@@ -35,7 +36,7 @@ class ChatMessageRepositoryCustomImpl(
 
         return mongoTemplate.aggregate(aggregation, "chat_message", ChatMessage::class.java).mappedResults
     }
-    
+
     override fun findUnreadMessageCount(myChatRooms: List<MyChatRoomsDto>): List<LastMessageDto> {
         val matchCriteria = myChatRooms.map {
             Criteria().andOperator(
@@ -63,5 +64,15 @@ class ChatMessageRepositoryCustomImpl(
         val aggregation = Aggregation.newAggregation(matchOperation, sortOperation, groupOperation)
 
         return mongoTemplate.aggregate(aggregation, "chat_message", LastMessageDto::class.java).mappedResults
+    }
+
+    override fun findMessagesWithPaging(chatRoomId: String, page: Long): List<ChatMessage> {
+        return mongoTemplate.find(
+            Query.query(Criteria.where("chatRoomId").`is`(chatRoomId))
+                .with(Sort.by(Sort.Order.desc("_id")))
+                .skip(page * 50)
+                .limit(51),
+            ChatMessage::class.java
+        )
     }
 }

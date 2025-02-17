@@ -7,7 +7,8 @@ class ChatDto {
 
     data class Response(
         val chatRoomName: String,
-        val messages: List<Message>
+        val messages: List<Message>,
+        val hasMore: Boolean
     ) {
         companion object {
             fun of(
@@ -16,12 +17,13 @@ class ChatDto {
                 messages: List<ChatMessage>
             ) = Response(
                 chatRoomName = chatRoomName,
-                messages = messages.map {
+                messages = messages.take(50).map {
                     Message.of(
                         nicknameMap[it.memberId] ?: "",
                         it,
                     )
-                }
+                },
+                hasMore = messages.size > 50
             )
         }
 

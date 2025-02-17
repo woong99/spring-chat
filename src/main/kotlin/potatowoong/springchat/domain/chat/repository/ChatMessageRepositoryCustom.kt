@@ -9,4 +9,6 @@ interface ChatMessageRepositoryCustom {
     fun findLastMessages(chatRoomIds: List<String>): List<ChatMessage>
 
     fun findUnreadMessageCount(myChatRooms: List<MyChatRoomsDto>): List<LastMessageDto>
+
+    fun findMessagesWithPaging(chatRoomId: String, page: Long): List<ChatMessage>
 }
