@@ -11,16 +11,17 @@ spring:
             enabled: false
     data:
         mongodb:
-            uri: mongodb://root:root!))$@mongodb:27017/spring_chat?authSource=admin
+            host: mongodb
+            port: 27017
+            database: spring_chat
+            username: root
+            password: root!))$
+            authentication-database: admin
     jpa:
         properties:
             hibernate:
                 show_sql: false
-    rabbitmq:
-        username: admin
-        password: 1234
-        host: rabbitmq
-        port: 5672
-        stomp-port: 61613
-notification:
-    queue-number: ${NOTIFICATION_QUEUE_NUMBER}
+    kafka:
+        bootstrap-servers: 182.218.242.146:13302
+        consumer:
+            group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID}

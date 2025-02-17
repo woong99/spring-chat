@@ -15,11 +15,8 @@ spring:
             username: root
             password: root!))$
             authentication-database: admin
-    rabbitmq:
-        username: admin
-        password: 1234
-        host: localhost
-        port: 5672
-        stomp-port: 61613
-notification:
-    queue-number: 1
+    kafka:
+        bootstrap-servers: localhost:13302
+        consumer:
+            group-id: 1
+
