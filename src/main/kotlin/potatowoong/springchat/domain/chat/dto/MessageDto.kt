@@ -1,10 +1,12 @@
 package potatowoong.springchat.domain.chat.dto
 
 import potatowoong.springchat.domain.auth.data.CustomUserDetails
+import potatowoong.springchat.domain.chat.enums.ChatCommand
 
 class MessageDto {
     data class Request(
         val message: String,
+        val type: ChatCommand
     )
 
     data class Message(

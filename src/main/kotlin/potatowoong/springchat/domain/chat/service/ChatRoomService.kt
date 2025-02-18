@@ -12,6 +12,7 @@ import potatowoong.springchat.domain.chat.entity.ChatRoomMember
 import potatowoong.springchat.domain.chat.repository.ChatMessageRepository
 import potatowoong.springchat.domain.chat.repository.ChatRoomMemberRepository
 import potatowoong.springchat.domain.chat.repository.ChatRoomRepository
+import potatowoong.springchat.global.config.redis.RedisUtils
 import potatowoong.springchat.global.exception.CustomException
 import potatowoong.springchat.global.exception.ErrorCode
 import potatowoong.springchat.global.utils.SecurityUtils
@@ -22,6 +23,7 @@ class ChatRoomService(
     private val chatRoomMemberRepository: ChatRoomMemberRepository,
     private val chatMessageRepository: ChatMessageRepository,
     private val memberRepository: MemberRepository,
+    private val redisUtils: RedisUtils
 ) {
     @Transactional
     fun addChatRoom(
@@ -90,6 +92,9 @@ class ChatRoomService(
         memberId: Long,
         chatRoomId: String
     ) {
+        // Redis에 입장한 채팅방 ID 저장
+        redisUtils.setDataToSet(memberId.toString(), chatRoomId)
+
         val savedChatRoomMember = chatRoomMemberRepository.findByChatRoomChatRoomIdAndMemberId(chatRoomId, memberId)
         if (savedChatRoomMember == null) {
             // 사용자 정보 조회
@@ -108,5 +113,19 @@ class ChatRoomService(
         } else {
             savedChatRoomMember.updateLastJoinedAt()
         }
+    }
+
+    @Transactional
+    fun leaveChatRoom(
+        memberId: Long,
+        chatRoomId: String
+    ) {
+        // 최근 입장 시간 갱신
+        val savedChatRoomMember = chatRoomMemberRepository.findByChatRoomChatRoomIdAndMemberId(chatRoomId, memberId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_ENTER_CHAT_ROOM)
+        savedChatRoomMember.updateLastJoinedAt()
+
+        // Redis에서 입장한 채팅방 ID 삭제
+        redisUtils.deleteDataFromSet(memberId.toString(), chatRoomId)
     }
 }

@@ -21,4 +21,5 @@ enum class ErrorCode(
     INCORRECT_ID_OR_PASSWORD(HttpStatus.BAD_REQUEST, "AU003", "아이디 또는 비밀번호가 일치하지 않습니다."),
 
     NOT_FOUND_CHAT_ROOM(HttpStatus.NOT_FOUND, "CR001", "존재하지 않는 채팅방입니다."),
+    NOT_FOUND_ENTER_CHAT_ROOM(HttpStatus.NOT_FOUND, "CR002", "입장한 채팅방이 존재하지 않습니다."),
 }
