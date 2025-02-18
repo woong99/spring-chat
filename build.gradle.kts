@@ -81,9 +81,12 @@ dependencies {
 
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
-    
+
     // MongoDB
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
     // Monitoring
     implementation("org.springframework.boot:spring-boot-starter-actuator")
