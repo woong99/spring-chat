@@ -7,4 +7,6 @@ import potatowoong.springchat.domain.chat.entity.ChatRoomMember
 interface ChatRoomMemberRepository : MongoRepository<ChatRoomMember, String> {
 
     fun findByChatRoomIdAndMemberId(chatRoomId: ObjectId, memberId: Long): ChatRoomMember?
+
+    fun findByChatRoomId(chatRoomId: ObjectId): List<ChatRoomMember>
 }
