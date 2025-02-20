@@ -1,59 +1,34 @@
 package potatowoong.springchat.domain.chat.entity
 
-import jakarta.persistence.*
-import potatowoong.springchat.domain.auth.entity.Member
+import jakarta.persistence.Id
+import org.bson.types.ObjectId
+import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
-@Entity
-@Table(
-    indexes = [
-        Index(name = "idx_chat_room_member_chat_room_id", columnList = "chat_room_id"),
-        Index(name = "idx_chat_room_member_member_id", columnList = "member_id")
-    ]
-)
+@Document(collection = "chat_room_member")
 class ChatRoomMember(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: String? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "chat_room_id",
-        nullable = false,
-        updatable = false,
-        foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT)
-    )
-    val chatRoom: ChatRoom,
+    val chatRoomId: ObjectId,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "member_id",
-        nullable = false,
-        updatable = false,
-        foreignKey = ForeignKey(ConstraintMode.NO_CONSTRAINT)
-    )
-    val member: Member,
+    val memberId: Long,
 
-    @Column(nullable = false, updatable = false)
-    val firstJoinedAt: LocalDateTime,
+    val firstJoinedAt: LocalDateTime = LocalDateTime.now(),
 
-    @Column(nullable = false)
-    var lastJoinedAt: LocalDateTime
+    var lastJoinedAt: LocalDateTime? = null
 ) {
-
-    fun updateLastJoinedAt() {
-        lastJoinedAt = LocalDateTime.now()
-    }
-
     companion object {
         fun of(
-            chatRoom: ChatRoom,
-            member: Member
+            chatRoomId: ObjectId,
+            memberId: Long
         ) = ChatRoomMember(
-            chatRoom = chatRoom,
-            member = member,
-            firstJoinedAt = LocalDateTime.now(),
-            lastJoinedAt = LocalDateTime.now()
+            chatRoomId = chatRoomId,
+            memberId = memberId
         )
+    }
+
+    fun updateLastJoinedAt() {
+        this.lastJoinedAt = LocalDateTime.now()
     }
 }

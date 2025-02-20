@@ -1,11 +1,8 @@
 package potatowoong.springchat.domain.chat.repository
 
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.mongodb.repository.MongoRepository
 import potatowoong.springchat.domain.chat.entity.Chat
 
-interface ChatRepository : JpaRepository<Chat, String> {
+interface ChatRepository : MongoRepository<Chat, String>, ChatRepositoryCustom {
 
-    fun findAllByChatRoomChatRoomIdOrderBySendAtDesc(chatRoomId: String): List<Chat>
-
-    fun findTop100ByChatRoomChatRoomIdOrderBySendAtDesc(chatRoomId: String): List<Chat>
 }

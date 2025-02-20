@@ -3,7 +3,6 @@ package potatowoong.springchat.domain.chat.service
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
-import potatowoong.springchat.domain.chat.dto.UnreadMessageCountDto
 import potatowoong.springchat.domain.chat.repository.ChatRepository
 import potatowoong.springchat.domain.chat.repository.ChatRoomRepository
 import potatowoong.springchat.global.utils.SecurityUtils
@@ -64,33 +63,35 @@ class ChatRoomNotificationService(
         chatRoomId: String,
         message: String
     ) {
-        // 채팅방 및 채팅방 멤버 조회
-        val chatRoom = chatRoomRepository.findChatRoomAndChatRoomMembersByChatRoomId(chatRoomId)
-            ?: run {
-                log.error { "sendToClient - chatRoomId: $chatRoomId, error: ChatRoom not found" }
-                return
-            }
-
-        // 채팅방의 최근 100개의 채팅 조회
-        val topChats = chatRepository.findTop100ByChatRoomChatRoomIdOrderBySendAtDesc(chatRoomId)
-
-        chatRoom.chatRoomMembers.forEach {
-            val emitter = emitters[it.member.id] ?: return@forEach
-
-            val unreadCount = topChats.count { chat -> !chat.sendAt.isBefore(it.lastJoinedAt) }
-
-            emitter.send(
-                SseEmitter.event()
-                    .id("SYSTEM")
-                    .name("UNREAD_MESSAGE_COUNT")
-                    .data(
-                        UnreadMessageCountDto.of(
-                            chatRoomId = chatRoomId,
-                            unreadCount = unreadCount,
-                            lastMessage = topChats.first().content
-                        )
-                    )
-            )
-        }
+//        // 채팅방 및 채팅방 멤버 조회
+//        val chatRoom = chatRoomRepository.findChatRoomAndChatRoomMembersByChatRoomId(chatRoomId)
+//            ?: run {
+//                log.error { "sendToClient - chatRoomId: $chatRoomId, error: ChatRoom not found" }
+//                return
+//            }
+//
+//        // 채팅방의 최근 100개의 채팅 조회
+//        val topChats = chatRepository.findTop100ByChatRoomChatRoomIdOrderBySendAtDesc(chatRoomId)
+//
+//        chatRoom.chatRoomMembers.forEach {
+//            val emitter = emitters[it.member.id] ?: return@forEach
+//
+//            val unreadCount = topChats.count { chat -> !chat.sendAt.isBefore(it.lastJoinedAt) }
+//
+//            if (topChats.isNotEmpty()) {
+//                emitter.send(
+//                    SseEmitter.event()
+//                        .id("SYSTEM")
+//                        .name("UNREAD_MESSAGE_COUNT")
+//                        .data(
+//                            UnreadMessageCountDto.of(
+//                                chatRoomId = chatRoomId,
+//                                unreadCount = unreadCount,
+//                                lastMessage = topChats.first().content
+//                            )
+//                        )
+//                )
+//            }
+//        }
     }
 }

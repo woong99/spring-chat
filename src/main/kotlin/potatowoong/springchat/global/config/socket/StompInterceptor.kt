@@ -1,7 +1,6 @@
 package potatowoong.springchat.global.config.socket
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.simp.stomp.StompCommand
@@ -23,7 +22,7 @@ class StompInterceptor(
     private val chatRoomService: ChatRoomService,
     private val objectMapper: ObjectMapper
 ) : ChannelInterceptor {
-    
+
     override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
         val accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor::class.java)
 
@@ -40,6 +39,9 @@ class StompInterceptor(
                 leaveChatRoom(accessor)
                 return null;
             }
+        } else if (accessor?.command == StompCommand.SUBSCRIBE) {
+            // SUBSCRIBE 메시지인 경우 채팅방 입장 처리
+            enterChatRoom(accessor)
         }
 
         return super.preSend(message, channel)
@@ -74,6 +76,21 @@ class StompInterceptor(
     }
 
     /**
+     * 채팅방 입장 처리
+     */
+    private fun enterChatRoom(accessor: StompHeaderAccessor) {
+        val chatRoomId = accessor.getNativeHeader("destination")?.get(0)?.split("/")?.get(2)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
+        val user = accessor.user ?: throw CustomException(ErrorCode.UNAUTHORIZED)
+
+        chatRoomService.enterChatRoom(
+            user.name.toLong(),
+            chatRoomId,
+            accessor.getHeader("simpSessionId") as String
+        )
+    }
+
+    /**
      * 채팅방 퇴장 처리
      */
     private fun leaveChatRoom(accessor: StompHeaderAccessor) {
@@ -83,7 +100,8 @@ class StompInterceptor(
 
         chatRoomService.leaveChatRoom(
             user.name.toLong(),
-            chatRoomId
+            chatRoomId,
+            accessor.getHeader("simpSessionId") as String
         )
     }
 }

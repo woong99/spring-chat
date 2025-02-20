@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional
 import potatowoong.springchat.domain.auth.repository.MemberRepository
 import potatowoong.springchat.domain.chat.dto.ChatDto
 import potatowoong.springchat.domain.chat.dto.MessageDto
-import potatowoong.springchat.domain.chat.entity.ChatMessage
-import potatowoong.springchat.domain.chat.repository.ChatMessageRepository
+import potatowoong.springchat.domain.chat.entity.Chat
+import potatowoong.springchat.domain.chat.repository.ChatRepository
 import potatowoong.springchat.domain.chat.repository.ChatRoomRepository
 import potatowoong.springchat.global.exception.CustomException
 import potatowoong.springchat.global.exception.ErrorCode
@@ -16,7 +16,7 @@ import potatowoong.springchat.global.exception.ErrorCode
 class ChatService(
     private val memberRepository: MemberRepository,
     private val chatRoomRepository: ChatRoomRepository,
-    private val chatMessageRepository: ChatMessageRepository,
+    private val chatRepository: ChatRepository,
 ) {
     @Transactional
     fun saveChat(
@@ -25,15 +25,15 @@ class ChatService(
         memberId: Long
     ) {
         // 채팅방 정보 조회
-        val chatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
+        val mongoChatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
             ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
 
         // 채팅 저장
-        chatMessageRepository.save(
-            ChatMessage(
+        chatRepository.save(
+            Chat(
                 content = request.message,
                 memberId = memberId,
-                chatRoomId = chatRoom.chatRoomId!!
+                chatRoomId = mongoChatRoom.id!!,
             )
         )
     }
@@ -44,11 +44,11 @@ class ChatService(
         page: Long
     ): ChatDto.Response {
         // 채팅방 정보 조회
-        val chatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
+        val mongoChatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
             ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
 
         // 채팅 내역 조회
-        val messages = chatMessageRepository.findMessagesWithPaging(chatRoomId, page)
+        val messages = chatRepository.findMessagesWithPaging(chatRoomId, page)
 
         // 채팅방에 속한 멤버들의 닉네임 조회
         val memberIds = messages.map { it.memberId }.distinct()
@@ -56,7 +56,7 @@ class ChatService(
             .associate { it.id!! to it.nickname }
 
         return ChatDto.Response.of(
-            chatRoomName = chatRoom.name,
+            chatRoomName = mongoChatRoom.name,
             nicknameMap = nicknameMap,
             messages = messages
         )

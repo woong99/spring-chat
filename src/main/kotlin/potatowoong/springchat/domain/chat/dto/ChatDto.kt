@@ -1,6 +1,6 @@
 package potatowoong.springchat.domain.chat.dto
 
-import potatowoong.springchat.domain.chat.entity.ChatMessage
+import potatowoong.springchat.domain.chat.entity.Chat
 import java.time.ZoneOffset
 
 class ChatDto {
@@ -14,7 +14,7 @@ class ChatDto {
             fun of(
                 chatRoomName: String,
                 nicknameMap: Map<Long, String>,
-                messages: List<ChatMessage>
+                messages: List<Chat>
             ) = Response(
                 chatRoomName = chatRoomName,
                 messages = messages.take(50).map {
@@ -36,7 +36,7 @@ class ChatDto {
             companion object {
                 fun of(
                     nickname: String,
-                    chat: ChatMessage,
+                    chat: Chat,
                 ) = Message(
                     sender = chat.memberId,
                     nickname = nickname,

@@ -1,24 +1,17 @@
 package potatowoong.springchat.domain.chat.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Id
+import org.bson.types.ObjectId
+import org.springframework.data.mongodb.core.mapping.Document
 import potatowoong.springchat.domain.chat.dto.ChatRoomDto
-import potatowoong.springchat.global.config.db.entity.BaseEntity
 
-@Entity
+@Document(collection = "chat_room")
 class ChatRoom(
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    val chatRoomId: String? = null,
+    val id: ObjectId? = null,
 
-    @Column(nullable = false)
-    var name: String,
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom")
-    val chats: List<Chat> = mutableListOf(),
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRoom")
-    val chatRoomMembers: List<ChatRoomMember> = mutableListOf()
-) : BaseEntity() {
+    val name: String,
+) {
     companion object {
         fun of(
             request: ChatRoomDto.Request

@@ -1,5 +1,7 @@
 package potatowoong.springchat.domain.chat.service
 
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -9,7 +11,6 @@ import potatowoong.springchat.domain.chat.dto.ChatRoomDto
 import potatowoong.springchat.domain.chat.dto.MyChatRoomsDto
 import potatowoong.springchat.domain.chat.entity.ChatRoom
 import potatowoong.springchat.domain.chat.entity.ChatRoomMember
-import potatowoong.springchat.domain.chat.repository.ChatMessageRepository
 import potatowoong.springchat.domain.chat.repository.ChatRoomMemberRepository
 import potatowoong.springchat.domain.chat.repository.ChatRoomRepository
 import potatowoong.springchat.global.config.redis.RedisUtils
@@ -21,10 +22,12 @@ import potatowoong.springchat.global.utils.SecurityUtils
 class ChatRoomService(
     private val chatRoomRepository: ChatRoomRepository,
     private val chatRoomMemberRepository: ChatRoomMemberRepository,
-    private val chatMessageRepository: ChatMessageRepository,
     private val memberRepository: MemberRepository,
+    private val chatRoomMembersRepository: ChatRoomMemberRepository,
     private val redisUtils: RedisUtils
 ) {
+    private val log = KotlinLogging.logger { }
+
     @Transactional
     fun addChatRoom(
         request: ChatRoomDto.Request
@@ -35,7 +38,7 @@ class ChatRoomService(
 
         // 채팅방 생성
         val chatRoom = chatRoomRepository.save(ChatRoom.of(request))
-        chatRoomMemberRepository.save(ChatRoomMember.of(chatRoom, member))
+        chatRoomMemberRepository.save(ChatRoomMember.of(chatRoom.id!!, member.id!!))
     }
 
     @Transactional(readOnly = true)
@@ -46,86 +49,68 @@ class ChatRoomService(
 //        }
 
         // 채팅방 목록 조회
-        val chatRooms = chatRoomRepository.findAllChatRooms()
+//        val chatRooms = chatRoomRepository.findAllChatRooms()
 //        chatRooms.forEach {
 //            lastSendMessageMap[it.chatRoomId]?.let { sendAt ->
 //                it.updateLastSendAt(sendAt)
 //            }
 //        }
-        return chatRooms
+        return listOf() // TODO : 수정
     }
 
     @Transactional(readOnly = true)
     fun getMyChatRooms(): List<MyChatRoomsDto> {
         // 내 채팅방 목록 조회
-        val chatRooms = chatRoomRepository.findMyChatRooms()
-        val chatRoomIds = chatRooms.map { it.chatRoomId }
+        val myChatRooms = chatRoomRepository.findMyChatRooms()
+        val myChatRoomsMap = myChatRooms.associateBy { it.chatRoomId }
 
-        // 마지막 메시지 전송 일시 조회
-        val lastSendMessageMap = chatMessageRepository.findLastMessages(chatRoomIds).associateBy { it.chatRoomId }
-
-        // 마지막 메시지 추가
-        chatRooms.forEach {
-            lastSendMessageMap[it.chatRoomId]?.let { message ->
-                it.updateLastChatMessage(message)
+        // 현재 참여중인 채팅방인 경우 안읽은 메시지 수 0으로 변경
+        redisUtils.getDataFromSet(SecurityUtils.getCurrentUserId().toString())?.let { chatRoomIds ->
+            chatRoomIds.forEach { chatRoomId ->
+                myChatRoomsMap[chatRoomId.toString().split("-")[0]]?.markAllMessageAsRead()
             }
         }
 
-        // 안 읽은 메시지 수 조회
-        val unreadCountMap = chatMessageRepository.findUnreadMessageCount(chatRooms).associate {
-            it.chatRoomId to it.unreadCount
-        }
-
-        // 안 읽은 메시지 수 추가
-        chatRooms.forEach {
-            unreadCountMap[it.chatRoomId]?.let { unreadCount ->
-                it.updateUnreadCount(unreadCount)
-            }
-        }
-
-        // 정렬 - 마지막 메시지 전송 일시가 늦은 순
-        return chatRooms.sortedByDescending { it.lastSendAt }
+        return myChatRooms
     }
 
     @Transactional
     fun enterChatRoom(
         memberId: Long,
-        chatRoomId: String
+        chatRoomId: String,
+        simpSessionId: String
     ) {
         // Redis에 입장한 채팅방 ID 저장
-        redisUtils.setDataToSet(memberId.toString(), chatRoomId)
+        redisUtils.setDataToSet(memberId.toString(), "${chatRoomId}-${simpSessionId}")
 
-        val savedChatRoomMember = chatRoomMemberRepository.findByChatRoomChatRoomIdAndMemberId(chatRoomId, memberId)
+        // 채팅-사용자 관계 저장
+        val savedChatRoomMember = chatRoomMembersRepository.findByChatRoomIdAndMemberId(ObjectId(chatRoomId), memberId)
         if (savedChatRoomMember == null) {
-            // 사용자 정보 조회
-            val member = memberRepository.findByIdOrNull(memberId)
-                ?: throw CustomException(ErrorCode.UNAUTHORIZED)
-
-            // 채팅방 정보 조회
-            val chatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
-                ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
-
-            val chatRoomMember = ChatRoomMember.of(
-                chatRoom = chatRoom,
-                member = member
+            val chatRoomMember = ChatRoomMember(
+                chatRoomId = ObjectId(chatRoomId),
+                memberId = memberId
             )
-            chatRoomMemberRepository.save(chatRoomMember)
+            chatRoomMembersRepository.save(chatRoomMember)
         } else {
             savedChatRoomMember.updateLastJoinedAt()
+            chatRoomMembersRepository.save(savedChatRoomMember)
         }
     }
 
     @Transactional
     fun leaveChatRoom(
         memberId: Long,
-        chatRoomId: String
+        chatRoomId: String,
+        simpSessionId: String
     ) {
         // 최근 입장 시간 갱신
-        val savedChatRoomMember = chatRoomMemberRepository.findByChatRoomChatRoomIdAndMemberId(chatRoomId, memberId)
+        val savedChatRoomMember = chatRoomMembersRepository.findByChatRoomIdAndMemberId(ObjectId(chatRoomId), memberId)
             ?: throw CustomException(ErrorCode.NOT_FOUND_ENTER_CHAT_ROOM)
+
         savedChatRoomMember.updateLastJoinedAt()
+        chatRoomMembersRepository.save(savedChatRoomMember)
 
         // Redis에서 입장한 채팅방 ID 삭제
-        redisUtils.deleteDataFromSet(memberId.toString(), chatRoomId)
+        redisUtils.deleteDataFromSet(memberId.toString(), "${chatRoomId}-${simpSessionId}")
     }
 }
