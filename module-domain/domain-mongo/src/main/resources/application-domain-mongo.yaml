@@ -1,0 +1,27 @@
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: spring_chat
+      username: root
+      password: root!))$
+      authentication-database: admin
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  data:
+    mongodb:
+      host: mongodb
+      port: 27017
+      database: spring_chat
+      username: root
+      password: root!))$
+      authentication-database: admin

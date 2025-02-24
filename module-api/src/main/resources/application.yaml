@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: module-api
+  profiles:
+    active: local
+    include:
+      - domain-rdb
+      - domain-mongo
+      - domain-redis
+      - security
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    hibernate:
+      ddl-auto: update
+logging:
+  config: classpath:log4j2-local.xml
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    hibernate:
+      ddl-auto: validate
+logging:
+  config: classpath:log4j2-prod.xml

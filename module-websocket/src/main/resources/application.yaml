@@ -1,0 +1,34 @@
+spring:
+  profiles:
+    active: local
+    include:
+      - security
+      - domain-rdb
+      - domain-mongo
+      - domain-redis
+  application:
+    name: module-websocket
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  kafka:
+    bootstrap-servers: localhost:13302
+    consumer:
+      group-id: 1
+logging:
+  config: classpath:log4j2-local.xml
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  kafka:
+    bootstrap-servers: kafka:13302
+    consumer:
+      group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
+logging:
+  config: classpath:log4j2-prod.xml
