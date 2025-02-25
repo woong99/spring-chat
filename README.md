@@ -16,7 +16,7 @@
 - DB: MariaDB, MongoDB
 - ORM: JPA, Querydsl
 - WebSocket, STOMP
-- Message Broker: RabbitMQ
+- Message Broker: RabbitMQ, Kafka
 
 ### Front-end
 
@@ -40,10 +40,14 @@
 
 ## ⚙️ 인프라
 
-<img src="./assets/infra-v2.0.png" alt="인프라">
+<img src="./assets/infra-v3.0.png" alt="인프라">
 
 <br>
 <br>
+<details>
+<summary>v2.0 인프라</summary>
+<img src="./assets/infra-v2.0.png" alt="인프라">
+</details>
 <details>
 <summary>v1.5 인프라</summary>
 <img src="./assets/infra-v1.5.png" alt="인프라">
@@ -77,3 +81,7 @@
 
 - RabbitMQ 연동
 - 실시간 채팅 알림을 위한 SSE 서버 이중화 대응
+
+### v3.0
+
+- RabbitMQ -> Kafka 변경
