@@ -1,4 +1,4 @@
-package potatowoong.modulesecurity.auth.jwt.filter
+package potatowoong.moduleapi.config.security.filter
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest

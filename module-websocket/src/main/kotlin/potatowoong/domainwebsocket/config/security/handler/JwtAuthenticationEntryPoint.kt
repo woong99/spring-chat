@@ -1,4 +1,4 @@
-package potatowoong.modulesecurity.auth.jwt.handler
+package potatowoong.domainwebsocket.config.security.handler
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

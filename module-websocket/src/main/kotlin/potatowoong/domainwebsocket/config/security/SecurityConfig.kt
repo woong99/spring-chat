@@ -10,10 +10,10 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsUtils
+import potatowoong.domainwebsocket.config.security.filter.JwtAuthenticationFilter
+import potatowoong.domainwebsocket.config.security.handler.JwtAccessDeniedHandler
+import potatowoong.domainwebsocket.config.security.handler.JwtAuthenticationEntryPoint
 import potatowoong.modulesecurity.auth.jwt.components.JwtTokenProvider
-import potatowoong.modulesecurity.auth.jwt.filter.JwtAuthenticationFilter
-import potatowoong.modulesecurity.auth.jwt.handler.JwtAccessDeniedHandler
-import potatowoong.modulesecurity.auth.jwt.handler.JwtAuthenticationEntryPoint
 
 @Configuration
 @EnableWebSecurity
