@@ -12,7 +12,7 @@
 ### Back-end
 
 - Language: Kotlin 1.9.25
-- Framework: Spring Boot 3.4.1
+- Framework: Spring Boot 3.4.1, Spring WebFlux
 - DB: MariaDB, MongoDB
 - ORM: JPA, Querydsl
 - WebSocket, STOMP
@@ -40,10 +40,14 @@
 
 ## ⚙️ 인프라
 
-<img src="./assets/infra-v3.0.png" alt="인프라">
+<img src="./assets/infra-v4.0.png" alt="인프라">
 
 <br>
 <br>
+<details>
+<summary>v3.0 인프라</summary>
+<img src="./assets/infra-v3.0.png" alt="인프라">
+</details>
 <details>
 <summary>v2.0 인프라</summary>
 <img src="./assets/infra-v2.0.png" alt="인프라">
@@ -85,3 +89,10 @@
 ### v3.0
 
 - RabbitMQ -> Kafka 변경
+
+### v4.0
+
+- Multi Module 적용
+- 채팅 관련 데이터 MariaDB -> MongoDB로 변경
+- 채팅 내역 조회 시 무한 스크롤 적용
+- SSE + WebFlux를 이용해 채팅 실시간 알림 구현
