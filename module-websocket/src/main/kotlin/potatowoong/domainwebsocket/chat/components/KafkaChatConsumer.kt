@@ -6,7 +6,6 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Component
 import potatowoong.domainwebsocket.chat.dto.MessageDto
-import potatowoong.domainwebsocket.chat.dto.NotificationDto
 import potatowoong.domainwebsocket.config.kafka.KafkaConstants
 
 @Component
@@ -22,17 +21,6 @@ class KafkaChatConsumer(
         simpMessagingTemplate.convertAndSend(
             "/sub/${messageDto.chatRoomId}",
             messageDto
-        )
-
-        // 채팅방 실시간 갱신
-        kafkaTemplate.send(
-            KafkaConstants.NOTIFICATION_TOPIC,
-            objectMapper.writeValueAsString(
-                NotificationDto.of(
-                    messageDto.chatRoomId,
-                    messageDto.message
-                )
-            )
         )
     }
 }

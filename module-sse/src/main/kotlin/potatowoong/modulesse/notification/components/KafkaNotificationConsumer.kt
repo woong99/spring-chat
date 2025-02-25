@@ -19,6 +19,6 @@ class KafkaNotificationConsumer(
     ) {
         val notificationDto = objectMapper.readValue(notification, NotificationDto::class.java)
 
-        chatRoomNotificationService.sendToClient(notificationDto.chatRoomId, notificationDto.message)
+        chatRoomNotificationService.sendUnreadMessageCount(notificationDto.chatRoomId, notificationDto.message)
     }
 }

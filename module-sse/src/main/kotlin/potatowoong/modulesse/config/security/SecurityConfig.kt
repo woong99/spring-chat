@@ -1,41 +1,34 @@
 package potatowoong.modulesse.config.security
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.web.cors.CorsUtils
+import org.springframework.http.HttpMethod
+import org.springframework.security.authentication.ReactiveAuthenticationManager
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder
+import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository
 import potatowoong.modulesecurity.auth.jwt.components.JwtTokenProvider
-import potatowoong.modulesecurity.auth.jwt.filter.JwtAuthenticationFilter
-import potatowoong.modulesecurity.auth.jwt.handler.JwtAccessDeniedHandler
-import potatowoong.modulesecurity.auth.jwt.handler.JwtAuthenticationEntryPoint
+import reactor.core.publisher.Mono
+
 
 @Configuration
-@EnableWebSecurity
+@EnableWebFluxSecurity
 class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider,
-    private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
-    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler
+    private val objectMapper: ObjectMapper
 ) {
 
-    /**
-     * PasswordEncoder Bean 등록
-     */
-    @Bean
-    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
-
-    /**
-     * Security 설정
-     */
     @Bean
     fun filterChain(
-        http: HttpSecurity
-    ): SecurityFilterChain {
+        http: ServerHttpSecurity
+    ): SecurityWebFilterChain {
         // Basic Auth 비활성화
         http
             .httpBasic { it.disable() }
@@ -48,39 +41,60 @@ class SecurityConfig(
         http
             .formLogin { it.disable() }
 
-        // Session 비활성화
+        // Stateless Session 설정
         http
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
 
         // URL 권한 설정
         http
-            .authorizeHttpRequests {
-                it
-                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                    .requestMatchers(*PERMIT_ALL).permitAll()
-                    .anyRequest().authenticated()
+            .authorizeExchange {
+                it.pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                it.anyExchange().authenticated()
             }
 
-        // 예외 처리 설정
-        http.exceptionHandling {
-            it
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
-        }
+        http
+            .exceptionHandling {
+                // TODO : 예외 처리 추가
+            }
 
         // JwtAuthenticationFilter 설정
         http
             .addFilterBefore(
-                JwtAuthenticationFilter(jwtTokenProvider),
-                UsernamePasswordAuthenticationFilter::class.java
+                authenticationWebFilter(),
+                SecurityWebFiltersOrder.AUTHENTICATION
             )
+
         return http.build()
     }
 
-    companion object {
-        // 허용 URL
-        private val PERMIT_ALL = arrayOf(
-            "/ws-stomp/**",
-        )
+    /**
+     * AuthenticationWebFilter 설정
+     */
+    private fun authenticationWebFilter(): AuthenticationWebFilter {
+        val authenticationManager = ReactiveAuthenticationManager { data: Authentication? ->
+            Mono.just(
+                data!!
+            )
+        }
+
+        val authenticationWebFilter = AuthenticationWebFilter(authenticationManager)
+        authenticationWebFilter.setServerAuthenticationConverter(serverAuthenticationConverter())
+        return authenticationWebFilter
+    }
+
+    /**
+     * JWT Token 인증 처리
+     */
+    private fun serverAuthenticationConverter(): ServerAuthenticationConverter {
+        return ServerAuthenticationConverter { exchange ->
+            val token = exchange.request.headers.getFirst("Authorization")
+            if (token != null && token.startsWith("Bearer ")) {
+                val authentication = jwtTokenProvider.getAuthentication(token.substring(7))
+                SecurityContextHolder.getContext().authentication = authentication
+                
+                return@ServerAuthenticationConverter Mono.just(authentication)
+            }
+            Mono.empty()
+        }
     }
 }

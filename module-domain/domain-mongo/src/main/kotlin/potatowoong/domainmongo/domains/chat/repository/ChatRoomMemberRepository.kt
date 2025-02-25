@@ -7,4 +7,6 @@ import potatowoong.domainmongo.domains.chat.entity.ChatRoomMember
 interface ChatRoomMemberRepository : MongoRepository<ChatRoomMember, String>, ChatRoomMemberRepositoryCustom {
 
     fun findByChatRoomIdAndMemberId(chatRoomId: ObjectId, memberId: Long): ChatRoomMember?
+
+    fun findByChatRoomId(chatRoomId: ObjectId): List<ChatRoomMember>
 }

@@ -4,6 +4,7 @@ spring:
     include:
       - security
       - domain-mongo
+      - domain-redis
   application:
     name: module-sse
 

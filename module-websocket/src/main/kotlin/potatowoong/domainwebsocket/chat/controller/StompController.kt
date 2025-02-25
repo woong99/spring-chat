@@ -7,6 +7,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.RestController
 import potatowoong.domainwebsocket.chat.dto.MessageDto
+import potatowoong.domainwebsocket.chat.dto.NotificationDto
 import potatowoong.domainwebsocket.chat.service.ChatService
 import potatowoong.domainwebsocket.config.kafka.KafkaConstants
 import potatowoong.modulesecurity.auth.data.CustomUserDetails
@@ -42,6 +43,17 @@ class StompController(
                     userDetails = userDetails,
                     message = request.message,
                     chatRoomId = chatRoomId
+                )
+            )
+        )
+
+        // 채팅방 실시간 갱신
+        kafkaTemplate.send(
+            KafkaConstants.NOTIFICATION_TOPIC,
+            objectMapper.writeValueAsString(
+                NotificationDto.of(
+                    chatRoomId = chatRoomId,
+                    message = request.message
                 )
             )
         )
