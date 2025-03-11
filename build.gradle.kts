@@ -51,6 +51,9 @@ subprojects {
 
         // Kotlin-Logging
         implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
+
+        // Jasypt
+        implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5")
     }
 
     tasks.register("prepareKotlinBuildScriptModel") {}
