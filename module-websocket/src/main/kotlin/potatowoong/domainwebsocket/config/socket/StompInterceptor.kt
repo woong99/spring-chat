@@ -1,6 +1,7 @@
 package potatowoong.domainwebsocket.config.socket
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.simp.stomp.StompCommand
@@ -23,25 +24,35 @@ class StompInterceptor(
     private val objectMapper: ObjectMapper
 ) : ChannelInterceptor {
 
+    private val log = KotlinLogging.logger { }
+
     override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
         val accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor::class.java)
+        try {
+            if (accessor?.command == StompCommand.CONNECT) {
+                // CONNECT 메시지인 경우 토큰을 추출하여 인증 정보를 설정
+                val headers = accessor.getNativeHeader("Authorization")
 
-        if (accessor?.command == StompCommand.CONNECT) {
-            // CONNECT 메시지인 경우 토큰을 추출하여 인증 정보를 설정
-            val headers = accessor.getNativeHeader("Authorization")
+                accessor.user = getAuthentication(headers)
+            } else if (accessor?.command == StompCommand.SEND) {
+                val messageDto = parseMessageDto(message)
 
-            accessor.user = getAuthentication(headers)
-        } else if (accessor?.command == StompCommand.SEND) {
-            val messageDto = parseMessageDto(message)
-
-            // DISCONNECT 메시지인 경우 퇴장 처리
-            if (messageDto.type == ChatCommand.DISCONNECT) {
-                leaveChatRoom(accessor)
-                return null;
+                // DISCONNECT 메시지인 경우 퇴장 처리
+                if (messageDto.type == ChatCommand.DISCONNECT) {
+                    leaveChatRoom(accessor)
+                    return null;
+                }
+            } else if (accessor?.command == StompCommand.SUBSCRIBE) {
+                // Global 채널인 경우 처리하지 않음
+                val destination = accessor.getNativeHeader("destination")?.get(0)
+                if (destination?.equals("/sub/global") == true) {
+                    return super.preSend(message, channel)
+                }
+                // SUBSCRIBE 메시지인 경우 채팅방 입장 처리
+                enterChatRoom(accessor)
             }
-        } else if (accessor?.command == StompCommand.SUBSCRIBE) {
-            // SUBSCRIBE 메시지인 경우 채팅방 입장 처리
-            enterChatRoom(accessor)
+        } catch (e: Exception) {
+            log.error { e }
         }
 
         return super.preSend(message, channel)

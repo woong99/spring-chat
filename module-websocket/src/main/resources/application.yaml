@@ -8,6 +8,17 @@ spring:
       - domain-redis
   application:
     name: module-websocket
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+eureka:
+  instance:
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
 
 ---
 spring:
@@ -15,11 +26,15 @@ spring:
     activate:
       on-profile: local
   kafka:
-    bootstrap-servers: localhost:13302
+    bootstrap-servers: ENC(Ztjw+261SOpHag+TEEAxpnYxczh99OIunHhyzzkWeMU=)
     consumer:
       group-id: 1
 logging:
   config: classpath:log4j2-local.xml
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
 
 ---
 spring:
@@ -27,8 +42,13 @@ spring:
     activate:
       on-profile: prod
   kafka:
-    bootstrap-servers: kafka:13302
+    bootstrap-servers: ENC(zqQCJXYAZHqCud3kx4OKkQFDMjiDaYjpdyvPI9dB2HY=)
     consumer:
       group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
 logging:
   config: classpath:log4j2-prod.xml
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+load-balancer-url: ENC(RCmFpVB7zYUSEmo3xOjm3X2K30t/xv0ZTHGIkszKldknOlFi/b+o/ZE2fkwxb+uP)

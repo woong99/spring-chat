@@ -22,6 +22,9 @@ dependencies {
     // WebSocket
     implementation("org.springframework.boot:spring-boot-starter-websocket")
 
+    // Eureka Client
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.2.0")
+
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
 

@@ -7,7 +7,14 @@ class MessageDto {
     data class Request(
         val message: String,
         val type: ChatCommand
-    )
+    ) {
+        companion object {
+            fun ofClose() = Request(
+                message = "SHUTDOWN",
+                type = ChatCommand.SHUTDOWN
+            )
+        }
+    }
 
     data class Message(
         val sender: Long,
