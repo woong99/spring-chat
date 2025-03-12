@@ -106,7 +106,7 @@ pipeline {
                           scp -P 10022 "$jar" root@potatowoong.iptime.org:/containers/spring-10k-chat-server/jar
                       done
 
-                      ssh -p 10022 root@potatowoong.iptime.org
+                      ssh -p 10022 root@potatowoong.iptime.org << EOF
                       cd /containers/spring-10k-chat-server
                       pwd
                       if echo "${JAR_FILES}" | grep -q "module-websocket"; then
@@ -127,6 +127,7 @@ pipeline {
                       fi
                       pwd
                       ls
+                      EOF
                   '''
                 }
             }
