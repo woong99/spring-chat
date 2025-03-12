@@ -56,26 +56,28 @@ pipeline {
             steps {
                 sh 'chmod +x ./gradlew'
 
-                def changedModules = env.CHANGED_MODULES.split(',')
-                if ("module-common" in changedModules) {
-                    echo "Building module-common.."
-                    sh "./gradlew :module-common:buildDependents"
+                script {
+                    def changedModules = env.CHANGED_MODULES.split(',')
+                    if ("module-common" in changedModules) {
+                        echo "Building module-common.."
+                        sh "./gradlew :module-common:buildDependents"
 
-                    currentBuild.result = 'SUCCESS'
-                    return
-                }
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
 
-                if ("module-security" in changedModules) {
-                    echo "Building module-security.."
-                    sh "./gradlew :module-security:buildDependents"
+                    if ("module-security" in changedModules) {
+                        echo "Building module-security.."
+                        sh "./gradlew :module-security:buildDependents"
 
-                    currentBuild.result = 'SUCCESS'
-                    return
-                }
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
 
-                for (module in env.CHANGED_MODULES.split(',')) {
-                    echo "Building ${module}.."
-                    sh "./gradlew :${module}:build"
+                    for (module in env.CHANGED_MODULES.split(',')) {
+                        echo "Building ${module}.."
+                        sh "./gradlew :${module}:build"
+                    }
                 }
 
                 sh './gradlew --version'
