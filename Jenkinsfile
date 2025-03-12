@@ -83,7 +83,7 @@ pipeline {
         }
         stage('List Built JARs') {
             steps {
-                sh 'find . -path "*/build/libs/*.jar"'
+                sh 'find . -path "*/build/libs/*.jar" -not -name "*-plain.jar"'
             }
         }
         stage('Test') {
