@@ -17,6 +17,7 @@ pipeline {
                     def modules = ['module-api', 'module-common', 'module-domain', 'module-eureka', 'module-security', 'module-sse', 'module-websocket']
 
                     // 변경된 파일이 속한 모듈 찾기
+                    def changedModules = []
                     for (file in changedFiles) {
                         for (module in modules) {
                             if (file.startsWith(module)) {
