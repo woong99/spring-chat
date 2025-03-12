@@ -101,6 +101,7 @@ pipeline {
                       done
 
                       ssh -p 10022 root@potatowoong.iptime.org
+                      pwd
                       ls
                   '''
                 }
