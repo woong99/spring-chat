@@ -19,7 +19,7 @@ pipeline {
                     // 변경된 파일이 속한 모듈 찾기
                     for (file in changedFiles) {
                         for (module in modules) {
-                            if (file.startsWith(module) {
+                            if (file.startsWith(module)) {
                                 echo "Changed Module: ${module}"
                                 changedModules.add(module)
                             }
