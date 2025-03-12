@@ -1,0 +1,20 @@
+services:
+  nginx-lua:
+    image: openresty/openresty:alpine
+    container_name: nginx-lua
+    volumes:
+      - ./conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+      - ./lua:/lua
+      - ./logs/nginx-lua.log:/var/log/nginx-lua.log
+    ports:
+      - "13305:80"
+    environment:
+      TZ: "Asia/Seoul"
+    restart: always
+    networks:
+      - spring-10k-chat-network
+    command: [ "/bin/sh", "-c", "cp -r /lua/* /usr/local/openresty/lualib && openresty -g 'daemon off;'" ]
+
+networks:
+  spring-10k-chat-network:
+    external: true
