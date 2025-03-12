@@ -94,6 +94,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
+                sshagent (credentials : ['ssh']) {
+                    sh """
+                        scp -P 10022 -r ./**/build/libs/*.jar root@potatowoong.iptime.org:/containers/spring-10k-chat-server/jar
+                    """
+                }
             }
         }
         stage('Clean Jar') {
