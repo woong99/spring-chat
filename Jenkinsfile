@@ -6,6 +6,15 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Check Changed Modules') {
+            steps {
+                // 변경된 파일 목록 가져오기
+                def changedFiles = sh(script: 'git diff --name-only HEAD~1', returnStdout: true).trim().split("\n")
+                println changedFiles
+                // 모듈
+
+            }
+        }
         stage('Build') {
             steps {
                 sh 'chmod +x ./gradlew'
