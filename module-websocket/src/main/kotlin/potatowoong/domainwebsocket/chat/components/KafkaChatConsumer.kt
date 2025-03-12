@@ -22,7 +22,5 @@ class KafkaChatConsumer(
             "/sub/${messageDto.chatRoomId}",
             messageDto
         )
-
-
     }
 }
