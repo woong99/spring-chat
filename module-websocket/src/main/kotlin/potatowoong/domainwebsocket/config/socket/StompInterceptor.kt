@@ -51,6 +51,7 @@ class StompInterceptor(
                 // SUBSCRIBE 메시지인 경우 채팅방 입장 처리
                 enterChatRoom(accessor)
             }
+            log.info { "StompInterceptor: ${accessor?.command}" }
         } catch (e: Exception) {
             log.error { e }
         }
