@@ -85,6 +85,7 @@ pipeline {
             steps {
                 sh 'find . -path "*/build/libs/*.jar" -not -name "*-plain.jar"'
 
+                // 빌드된 JAR 파일 목록을 환경 변수로 전달
                 script {
                     def jarFiles = sh(script: 'find . -path "*/build/libs/*.jar" -not -name "*-plain.jar"', returnStdout: true).trim().split("\n")
                     env.JAR_FILES = jarFiles.join(',')
@@ -106,6 +107,22 @@ pipeline {
                       done
 
                       ssh -p 10022 root@potatowoong.iptime.org
+
+                      if [[ "${JAR_FILES}" == *"module-websocket"* ]]; then
+                          cd /containers/spring-10k-chat-server
+
+                          if [ $(docker ps | grep blue | wc -l) -gt 0 ]; then
+                              echo "Docker container with 'blue' is running"
+                              docker-compose -f docker-compose-websocket.yaml up -d $( docker-compose -f docker-compose-websocket.yaml config --services | grep "green*")
+                              docker-compose -f docker-compose-websocket.yaml down $(docker-compose -f docker-compose-websocket.yaml config --services | grep "blue*")
+                          else
+                              echo "No Docker container with 'blue' is running"
+                              docker-compose -f docker-compose-websocket.yaml up -d $( docker-compose -f docker-compose-websocket.yaml config --services | grep "blue*")
+                              docker-compose -f docker-compose-websocket.yaml down $(docker-compose -f docker-compose-websocket.yaml config --services | grep "green*")
+                          fi
+                      else
+                          echo "JAR files do not contain the specific string"
+                      fi
                       pwd
                       ls
                   '''
