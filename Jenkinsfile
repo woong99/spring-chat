@@ -79,9 +79,11 @@ pipeline {
                         sh "./gradlew :${module}:build"
                     }
                 }
-
-                sh './gradlew --version'
-                echo 'Building..'
+            }
+        }
+        stage('List Built JARs') {
+            steps {
+                sh 'find . -path "*/build/libs/*.jar"'
             }
         }
         stage('Test') {
