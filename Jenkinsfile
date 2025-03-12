@@ -84,6 +84,11 @@ pipeline {
         stage('List Built JARs') {
             steps {
                 sh 'find . -path "*/build/libs/*.jar" -not -name "*-plain.jar"'
+
+                script {
+                    def jarFiles = sh(script: 'find . -path "*/build/libs/*.jar" -not -name "*-plain.jar"', returnStdout: true).trim().split("\n")
+                    env.JAR_FILES = jarFiles.join(',')
+                }
             }
         }
         stage('Test') {
