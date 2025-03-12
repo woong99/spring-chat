@@ -107,7 +107,8 @@ pipeline {
                       done
 
                       ssh -p 10022 root@potatowoong.iptime.org
-
+                      cd /containers/spring-10k-chat-server
+                      pwd
                       if echo "${JAR_FILES}" | grep -q "module-websocket"; then
                           pwd
                           cd /containers/spring-10k-chat-server
