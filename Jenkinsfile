@@ -14,7 +14,17 @@ pipeline {
                     echo "Changed Files:\n${changedFiles}"
 
                     // 모듈 리스트 정의
-                    def modules = ['module-api', 'module-common', 'module-domain', 'module-eureka', 'module-security', 'module-sse', 'module-websocket']
+                    def modules = [
+                        'module-api',
+                        'module-common',
+                        'module-domain:domain-mongo',
+                        'module-domain:domain-redis',
+                        'module-domain:domain-rdb',
+                        'module-eureka',
+                        'module-security',
+                        'module-sse',
+                        'module-websocket'
+                    ]
 
                     // 변경된 파일이 속한 모듈 찾기
                     def changedModules = []
@@ -45,6 +55,29 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'chmod +x ./gradlew'
+
+                def changedModules = env.CHANGED_MODULES.split(',')
+                if ("module-common" in changedModules) {
+                    echo "Building module-common.."
+                    sh "./gradlew :module-common:buildDependents"
+
+                    currentBuild.result = 'SUCCESS'
+                    return
+                }
+
+                if ("module-security" in changedModules) {
+                    echo "Building module-security.."
+                    sh "./gradlew :module-security:buildDependents"
+
+                    currentBuild.result = 'SUCCESS'
+                    return
+                }
+
+                for (module in env.CHANGED_MODULES.split(',')) {
+                    echo "Building ${module}.."
+                    sh "./gradlew :${module}:build"
+                }
+
                 sh './gradlew --version'
                 echo 'Building..'
             }
