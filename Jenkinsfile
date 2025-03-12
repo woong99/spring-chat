@@ -122,7 +122,7 @@ pipeline {
                               echo "Stopping 'blue'.."
                               docker-compose -f docker-compose-websocket.yaml down $(docker-compose -f docker-compose-websocket.yaml config --services | grep "blue*")
                           else
-                              echo "No Docker container with 'blue' is running"
+                              echo "No Docker container with 'green' is running"
 
                               echo "Switching to 'blue'.."
                               docker-compose -f docker-compose-websocket.yaml up -d $( docker-compose -f docker-compose-websocket.yaml config --services | grep "blue*")
@@ -135,7 +135,6 @@ pipeline {
                       fi
                       pwd
                       ls
-                      EOF
                   '''
                 }
             }
