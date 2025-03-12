@@ -113,7 +113,7 @@ pipeline {
                           pwd
                           cd /containers/spring-10k-chat-server
 
-                          if [ $(docker ps | grep blue | wc -l) -gt 0 ]; then
+                          if docker ps | grep -q "blue"; then
                               echo "Docker container with 'blue' is running"
 
                               echo "Switching to 'green'.."
