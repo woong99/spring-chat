@@ -1,9 +1,14 @@
 pipeline {
     agent any
     stages {
+        stage('Clone Repository') {
+            steps {
+                checkout scm
+            }
+        }
         stage('Build') {
             steps {
-                sh 'gradle --version'
+                sh './gradlew --version'
                 echo 'Building..'
             }
         }
