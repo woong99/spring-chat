@@ -86,18 +86,6 @@ pipeline {
                 sh 'find . -path "*/build/libs/*.jar"'
             }
         }
-        stage('List Changed Module JARs') {
-            steps {
-                script {
-                    def changedModules = sh(script: "git diff --name-only HEAD~1 | grep '^module-' | cut -d'/' -f1 | sort | uniq", returnStdout: true).trim()
-                    if (changedModules) {
-                        sh "find ${changedModules} -path '*/build/libs/*.jar'"
-                    } else {
-                        echo "No changed modules"
-                    }
-                }
-            }
-        }
         stage('Test') {
             steps {
                 echo 'Testing..'
@@ -106,6 +94,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
+            }
+        }
+        stage('Clean Jar') {
+            steps {
+                sh 'rm -rf ./**/build/libs/*.jar'
             }
         }
     }
