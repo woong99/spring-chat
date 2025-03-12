@@ -117,18 +117,18 @@ pipeline {
                               echo "Docker container with 'blue' is running"
 
                               echo "Switching to 'green'.."
-                              docker-compose -p websocket-green -f docker-compose-websocket.yaml up -d $( docker-compose -f docker-compose-websocket.yaml config --services | grep "green*")
+                              docker-compose -p websocket-green -f docker-compose-websocket.yaml up -d $( docker-compose -f docker-compose-websocket.yaml config --services | grep "^green*)
 
                               echo "Stopping 'blue'.."
-                              docker-compose -f docker-compose-websocket.yaml down $(docker-compose -f docker-compose-websocket.yaml config --services | grep "blue*")
+                              docker-compose -f docker-compose-websocket.yaml down $(docker-compose -f docker-compose-websocket.yaml config --services | grep "^blue")
                           else
                               echo "No Docker container with 'green' is running"
 
                               echo "Switching to 'blue'.."
-                              docker-compose -p websocket-blue -f docker-compose-websocket.yaml up -d $( docker-compose -f docker-compose-websocket.yaml config --services | grep "blue*")
+                              docker-compose -p websocket-blue -f docker-compose-websocket.yaml up -d $( docker-compose -f docker-compose-websocket.yaml config --services | grep "^blue")
 
                               echo "Stopping 'green'.."
-                              docker-compose -f docker-compose-websocket.yaml down $(docker-compose -f docker-compose-websocket.yaml config --services | grep "green*")
+                              docker-compose -f docker-compose-websocket.yaml down $(docker-compose -f docker-compose-websocket.yaml config --services | grep "^green")
                           fi
                       else
                           echo "JAR files do not contain the specific string"
