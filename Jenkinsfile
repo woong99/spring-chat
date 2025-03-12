@@ -115,11 +115,19 @@ pipeline {
 
                           if [ $(docker ps | grep blue | wc -l) -gt 0 ]; then
                               echo "Docker container with 'blue' is running"
+
+                              echo "Switching to 'green'.."
                               docker-compose -f docker-compose-websocket.yaml up -d $( docker-compose -f docker-compose-websocket.yaml config --services | grep "green*")
+
+                              echo "Stopping 'blue'.."
                               docker-compose -f docker-compose-websocket.yaml down $(docker-compose -f docker-compose-websocket.yaml config --services | grep "blue*")
                           else
                               echo "No Docker container with 'blue' is running"
+
+                              echo "Switching to 'blue'.."
                               docker-compose -f docker-compose-websocket.yaml up -d $( docker-compose -f docker-compose-websocket.yaml config --services | grep "blue*")
+
+                              echo "Stopping 'green'.."
                               docker-compose -f docker-compose-websocket.yaml down $(docker-compose -f docker-compose-websocket.yaml config --services | grep "green*")
                           fi
                       else
