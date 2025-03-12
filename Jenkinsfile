@@ -119,8 +119,8 @@ pipeline {
                               echo "Switching to 'green'.."
                               docker-compose -p websocket-green -f docker-compose-websocket.yaml up -d green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
 
-                              echo "Stopping 'blue'.."
-                              docker-compose -f docker-compose-websocket.yaml down blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
+                              echo "Stopping 'blue'.."''
+                              docker stop blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
                           else
                               echo "No Docker container with 'green' is running"
 
@@ -128,7 +128,7 @@ pipeline {
                               docker-compose -p websocket-blue -f docker-compose-websocket.yaml up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
 
                               echo "Stopping 'green'.."
-                              docker-compose -f docker-compose-websocket.yaml down green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
+                              docker stop green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
                           fi
                       else
                           echo "JAR files do not contain the specific string"
