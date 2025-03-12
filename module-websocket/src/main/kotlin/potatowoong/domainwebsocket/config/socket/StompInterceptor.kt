@@ -53,7 +53,7 @@ class StompInterceptor(
             }
             log.info { "StompInterceptor: ${accessor?.command}" }
         } catch (e: Exception) {
-            log.error { e }
+            log.error { e.printStackTrace() }
         }
 
         return super.preSend(message, channel)
