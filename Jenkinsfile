@@ -108,7 +108,7 @@ pipeline {
 
                       ssh -p 10022 root@potatowoong.iptime.org
 
-                      if [ "${JAR_FILES}" == *"module-websocket"* ]; then
+                      if [ "${JAR_FILES}" = *"module-websocket"* ]; then
                           cd /containers/spring-10k-chat-server
 
                           if [ $(docker ps | grep blue | wc -l) -gt 0 ]; then
