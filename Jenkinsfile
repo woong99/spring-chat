@@ -95,9 +95,11 @@ pipeline {
             steps {
                 echo 'Deploying....'
                 sshagent (credentials : ['ssh']) {
-                    sh """
-                        scp -P 10022 -r ./**/build/libs/*.jar root@potatowoong.iptime.org:/containers/spring-10k-chat-server/jar
-                    """
+                  sh '''
+                      for jar in $(find . -path "*/build/libs/*.jar" -not -name "*-plain.jar"); do
+                      scp -P 10022 "$jar" root@potatowoong.iptime.org:/containers/spring-10k-chat-server/jar
+                      done
+                  '''
                 }
             }
         }
