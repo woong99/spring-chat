@@ -15,4 +15,3 @@ class DomainWebsocketApplication
 fun main(args: Array<String>) {
     runApplication<DomainWebsocketApplication>(*args)
 }
-
