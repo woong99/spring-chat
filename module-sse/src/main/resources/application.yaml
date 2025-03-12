@@ -7,6 +7,11 @@ spring:
       - domain-redis
   application:
     name: module-sse
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 ---
 spring:
@@ -14,7 +19,7 @@ spring:
     activate:
       on-profile: local
   kafka:
-    bootstrap-servers: localhost:13302
+    bootstrap-servers: 182.218.242.146:13302
     consumer:
       group-id: 1
 logging:
@@ -26,7 +31,7 @@ spring:
     activate:
       on-profile: prod
   kafka:
-    bootstrap-servers: kafka:13302
+    bootstrap-servers: ENC(zqQCJXYAZHqCud3kx4OKkQFDMjiDaYjpdyvPI9dB2HY=)
     consumer:
       group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
 logging:
