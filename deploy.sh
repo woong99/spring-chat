@@ -6,10 +6,11 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
 
     echo "Switching to 'green'.."
     docker-compose up -d green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
-
+    echo "green up"
     sleep 5
 
     ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
+    echo "ws_length: $ws_length"
     if [ "$ws_length" -eq 6 ]; then
       echo "Stopping 'blue'.."''
       curl http://localhost:13305/remove-ip-when-deploy?deploy=BLUE
@@ -20,10 +21,12 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
 
     echo "Switching to 'blue'.."
     docker-compose up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
+    echo "blue up"
 
     sleep 5
 
     ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
+    echo "ws_length: $ws_length"
     if [ "$ws_length" -eq 6 ]; then
       echo "Stopping 'green'.."
       curl http://localhost:13305/remove-ip-when-deploy?deploy=GREEN

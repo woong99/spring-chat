@@ -12,3 +12,4 @@ class RestTemplateConfig {
         return RestTemplate()
     }
 }
+
