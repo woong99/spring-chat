@@ -1,12 +1,11 @@
-cd /containers/spring-10k-chat-server
-
 # WebSocket 서버인 경우 Blue-Green 배포 실행
 if echo "${JAR_FILES}" | grep -q "module-websocket"; then
+  cd /containers/spring-10k-chat-server/websocket
   if docker ps | grep -q "blue"; then
     echo "Docker container with 'blue' is running"
 
     echo "Switching to 'green'.."
-    docker-compose -p websocket-green -f docker-compose-websocket.yaml up -d green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
+    docker-compose up -d green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
 
     sleep 5
 
@@ -20,7 +19,7 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
     echo "No Docker container with 'green' is running"
 
     echo "Switching to 'blue'.."
-    docker-compose -p websocket-blue -f docker-compose-websocket.yaml up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
+    docker-compose up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
 
     sleep 5
 
