@@ -4,31 +4,31 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
   if docker ps | grep -q "blue"; then
     echo "Docker container with 'blue' is running"
 
-    echo "Switching to 'green'.."
+    echo "$(date) - Switching to 'green'.."
     docker-compose up -d green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
-    echo "green up"
+    echo "$(date) - green up"
     sleep 10
 
     ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
-    echo "ws_length: $ws_length"
+    echo "$(date) - ws_length: $ws_length"
     if [ "$ws_length" -eq 6 ]; then
-      echo "Stopping 'blue'.."''
+      echo "$(date) - Stopping 'blue'.."
       curl http://localhost:13305/remove-ip-when-deploy?deploy=BLUE
       docker stop blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
     fi
   else
     echo "No Docker container with 'green' is running"
 
-    echo "Switching to 'blue'.."
+    echo "$(date) - Switching to 'blue'.."
     docker-compose up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
-    echo "blue up"
+    echo "blue up"echo "$(date) - blue up"
 
     sleep 10
 
     ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
-    echo "ws_length: $ws_length"
+    echo "$(date) - ws_length: $ws_length"
     if [ "$ws_length" -eq 6 ]; then
-      echo "Stopping 'green'.."
+      echo "$(date) - Stopping 'green'.."
       curl http://localhost:13305/remove-ip-when-deploy?deploy=GREEN
       docker stop green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
     fi

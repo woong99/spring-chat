@@ -30,3 +30,4 @@ class ServerStartUpEventListener(
         restTemplate.getForObject("$loadBalancerUrl/ws-up?ip=$ip&deploy=$deploy", String::class.java)
     }
 }
+
