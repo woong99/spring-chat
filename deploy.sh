@@ -1,4 +1,5 @@
 echo "Deploying.."
+echo "JAR files: ${JAR_FILES}"
 cd /containers/spring-10k-chat-server
 pwd
 if echo "${JAR_FILES}" | grep -q "module-websocket"; then
