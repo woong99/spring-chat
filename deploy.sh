@@ -7,7 +7,7 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
     echo "Switching to 'green'.."
     docker-compose up -d green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
     echo "green up"
-    sleep 5
+    sleep 10
 
     ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
     echo "ws_length: $ws_length"
@@ -23,7 +23,7 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
     docker-compose up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
     echo "blue up"
 
-    sleep 5
+    sleep 10
 
     ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
     echo "ws_length: $ws_length"
