@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit
 class ServerShutdownEventListener(
     @Value("\${load-balancer-url}")
     private val loadBalancerUrl: String,
+    @Value("\${deploy}")
+    private val deploy: String,
     private val restTemplate: RestTemplate,
     private val messagingTemplate: SimpMessagingTemplate,
     private val webSocketMessageBrokerStats: WebSocketMessageBrokerStats
@@ -35,7 +37,7 @@ class ServerShutdownEventListener(
             .hostAddress
 
         // 로드밸런서에 서버 Down 상태 전달
-        restTemplate.getForObject("$loadBalancerUrl/ws-down?ip=$ip", String::class.java)
+        restTemplate.getForObject("$loadBalancerUrl/ws-down?ip=$ip&deploy=$deploy", String::class.java)
 
         // 모든 웹소켓 세션 종료
         messagingTemplate.convertAndSend("/sub/global", MessageDto.Request.ofClose())

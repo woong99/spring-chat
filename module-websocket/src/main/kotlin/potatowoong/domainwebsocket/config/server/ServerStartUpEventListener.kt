@@ -14,7 +14,9 @@ import java.net.NetworkInterface
 class ServerStartUpEventListener(
     @Value("\${load-balancer-url}")
     private val loadBalancerUrl: String,
-    private val restTemplate: RestTemplate
+    @Value("\${deploy}")
+    private val deploy: String,
+    private val restTemplate: RestTemplate,
 ) : ApplicationListener<ApplicationReadyEvent> {
 
     override fun onApplicationEvent(event: ApplicationReadyEvent) {
@@ -25,6 +27,6 @@ class ServerStartUpEventListener(
             .hostAddress
 
         // 로드밸런서에 서버 Up 상태 전달
-        restTemplate.getForObject("$loadBalancerUrl/ws-up?ip=$ip", String::class.java)
+        restTemplate.getForObject("$loadBalancerUrl/ws-up?ip=$ip&deploy=$deploy", String::class.java)
     }
 }
