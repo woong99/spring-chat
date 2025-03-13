@@ -13,14 +13,13 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
     ws-length = $(curl -s localhost:8761/helper/info | jq '. | length')
     if [ "$length" -eq 6]; then
       echo "Stopping 'blue'.."''
-      curl http://nginx-lua:13305/remove-ip-when-deploy?deploy=blue
+      curl http://localhost:13305/remove-ip-when-deploy?deploy=blue
       docker stop blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
     fi
   else
     echo "No Docker container with 'green' is running"
 
     echo "Switching to 'blue'.."
-    curl http://nginx-lua:13305/remove-ip-when-deploy?deploy=blue
     docker-compose -p websocket-blue -f docker-compose-websocket.yaml up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
 
     sleep 5
@@ -28,6 +27,7 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
     ws-length = $(curl -s localhost:8761/helper/info | jq '. | length')
     if [ "$length" -eq 6]; then
       echo "Stopping 'green'.."
+      curl http://localhost:13305/remove-ip-when-deploy?deploy=blue
       docker stop green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
     fi
   fi
