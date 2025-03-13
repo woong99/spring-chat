@@ -107,7 +107,7 @@ pipeline {
                       done
 
                       scp -P 10022 deploy.sh root@potatowoong.iptime.org:/containers/spring-10k-chat-server/deploy.sh
-                      ssh -p 10022 root@potatowoong.iptime.org 'bash /containers/spring-10k-chat-server/deploy.sh'
+                      ssh -p 10022 root@potatowoong.iptime.org 'JAR_FILES="${JAR_FILES}" bash /containers/spring-10k-chat-server/deploy.sh'
                   '''
                 }
             }
