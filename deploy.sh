@@ -9,10 +9,10 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
 
     sleep 5
 
-    ws-length = $(curl -s localhost:8761/helper/info | jq '. | length')
-    if [ "$length" -eq 6]; then
+    ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
+    if [ "$ws_length" -eq 6 ]; then
       echo "Stopping 'blue'.."''
-      curl http://localhost:13305/remove-ip-when-deploy?deploy=blue
+      curl http://localhost:13305/remove-ip-when-deploy?deploy=BLUE
       docker stop blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
     fi
   else
@@ -23,10 +23,10 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
 
     sleep 5
 
-    ws-length = $(curl -s localhost:8761/helper/info | jq '. | length')
-    if [ "$length" -eq 6]; then
+    ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
+    if [ "$ws_length" -eq 6 ]; then
       echo "Stopping 'green'.."
-      curl http://localhost:13305/remove-ip-when-deploy?deploy=blue
+      curl http://localhost:13305/remove-ip-when-deploy?deploy=GREEN
       docker stop green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
     fi
   fi
