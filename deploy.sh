@@ -1,37 +1,36 @@
-echo "Deploying.."
-echo "JAR files: ${JAR_FILES}"
 cd /containers/spring-10k-chat-server
-pwd
+
+# WebSocket 서버인 경우 Blue-Green 배포 실행
 if echo "${JAR_FILES}" | grep -q "module-websocket"; then
-    if docker ps | grep -q "blue"; then
-        echo "Docker container with 'blue' is running"
+  if docker ps | grep -q "blue"; then
+    echo "Docker container with 'blue' is running"
 
-        echo "Switching to 'green'.."
-        docker-compose -p websocket-green -f docker-compose-websocket.yaml up -d green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
+    echo "Switching to 'green'.."
+    docker-compose -p websocket-green -f docker-compose-websocket.yaml up -d green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
 
-        while docker ps | grep -q "blue"; do
-            echo "Waiting for 'blue' to stop.."
-            sleep 1
-        done
+    sleep 5
 
-        echo "Stopping 'blue'.."''
-        docker stop blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
-    else
-        echo "No Docker container with 'green' is running"
-
-        echo "Switching to 'blue'.."
-        docker-compose -p websocket-blue -f docker-compose-websocket.yaml up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
-
-        while docker ps | grep -q "green"; do
-            echo "Waiting for 'green' to stop.."
-            sleep 1
-        done
-
-        echo "Stopping 'green'.."
-        docker stop green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
+    ws-length = $(curl -s localhost:8761/helper/info | jq '. | length')
+    if [ "$length" -eq 6]; then
+      echo "Stopping 'blue'.."''
+      curl http://nginx-lua:13305/remove-ip-when-deploy?deploy=blue
+      docker stop blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
     fi
+  else
+    echo "No Docker container with 'green' is running"
+
+    echo "Switching to 'blue'.."
+    curl http://nginx-lua:13305/remove-ip-when-deploy?deploy=blue
+    docker-compose -p websocket-blue -f docker-compose-websocket.yaml up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
+
+    sleep 5
+
+    ws-length = $(curl -s localhost:8761/helper/info | jq '. | length')
+    if [ "$length" -eq 6]; then
+      echo "Stopping 'green'.."
+      docker stop green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
+    fi
+  fi
 else
-    echo "JAR files do not contain the specific string"
+  echo "JAR files do not contain the specific string"
 fi
-pwd
-ls
