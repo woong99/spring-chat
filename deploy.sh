@@ -1,36 +1,57 @@
+# 컨테이너들이 정상적으로 실행되었는지 확인
+check_ws_container() {
+  ws_length=0
+  counter=0
+  max_attempts=10
+
+  while [ "$ws_length" -ne 6 ] && [ "$counter" -lt "$max_attempts" ]; do
+    ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
+    echo "$(date) - ws_length: $ws_length"
+    sleep 3
+    counter=$((counter + 1))
+  done
+
+  if [ "$ws_length" -eq 6 ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# 이전 컨테이너 중지
+stop_old_container() {
+  local color=$1
+  echo "$(date) - Stopping '$color'.."
+  curl "http://localhost:13305/remove-ip-when-deploy?deploy=${color^^}"
+  docker stop $(docker ps | grep $color | awk '{print $NF}' | tr '\n' ' ')
+}
+
 # WebSocket 서버인 경우 Blue-Green 배포 실행
 if echo "${JAR_FILES}" | grep -q "module-websocket"; then
   cd /containers/spring-10k-chat-server/websocket
   if docker ps | grep -q "blue"; then
     echo "Docker container with 'blue' is running"
 
+    # Green 컨테이너 실행
     echo "$(date) - Switching to 'green'.."
-    docker-compose up -d "$(docker-compose config --services | grep ^green)"
+    docker-compose up -d $(docker-compose config --services | grep ^green | tr '\n' ' ')
     echo "$(date) - green up"
-    sleep 20
 
-    ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
-    echo "$(date) - ws_length: $ws_length"
-    if [ "$ws_length" -eq 6 ]; then
-      echo "$(date) - Stopping 'blue'.."
-      curl http://localhost:13305/remove-ip-when-deploy?deploy=BLUE
-      docker stop blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
+    # Green 컨테이너가 정상적으로 실행되었는지 확인(최대 10번 시도) 후 Blue 컨테이너 중지
+    if check_ws_container; then
+      stop_old_container "blue"
     fi
   else
     echo "No Docker container with 'green' is running"
 
+    # Blue 컨테이너 실행
     echo "$(date) - Switching to 'blue'.."
-    docker-compose up -d "$(docker-compose config --services | grep ^blue)"
+    docker-compose up -d $(docker-compose config --services | grep ^blue | tr '\n' ' ')
     echo "blue up"echo "$(date) - blue up"
 
-    sleep 20
-
-    ws_length=$(curl -s localhost:8761/helper/info | jq '. | length')
-    echo "$(date) - ws_length: $ws_length"
-    if [ "$ws_length" -eq 6 ]; then
-      echo "$(date) - Stopping 'green'.."
-      curl http://localhost:13305/remove-ip-when-deploy?deploy=GREEN
-      docker stop green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
+    # Blue 컨테이너가 정상적으로 실행되었는지 확인(최대 10번 시도) 후 Green 컨테이너 중지
+    if check_ws_container; then
+      stop_old_container "green"
     fi
   fi
 else
