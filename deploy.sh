@@ -5,7 +5,7 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
     echo "Docker container with 'blue' is running"
 
     echo "$(date) - Switching to 'green'.."
-    docker-compose up -d green-spring-10k-chat-websocket1 green-spring-10k-chat-websocket2 green-spring-10k-chat-websocket3
+    docker-compose up -d "$(docker-compose config --services | grep ^green)"
     echo "$(date) - green up"
     sleep 20
 
@@ -20,7 +20,7 @@ if echo "${JAR_FILES}" | grep -q "module-websocket"; then
     echo "No Docker container with 'green' is running"
 
     echo "$(date) - Switching to 'blue'.."
-    docker-compose up -d blue-spring-10k-chat-websocket1 blue-spring-10k-chat-websocket2 blue-spring-10k-chat-websocket3
+    docker-compose up -d "$(docker-compose config --services | grep ^blue)"
     echo "blue up"echo "$(date) - blue up"
 
     sleep 20
