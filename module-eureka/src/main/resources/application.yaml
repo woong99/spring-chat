@@ -9,3 +9,6 @@ eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
+  server:
+    response-cache-update-interval-ms: 5000 # 캐시 갱신 주기
+  helper-url: enc*(e7ANdMjug9ITc54CXGvq3n96l07SDIJSIF1eft2nWg18UitvpnhtQMB+BXMovrY9)
