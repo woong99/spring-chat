@@ -58,6 +58,8 @@ pipeline {
 
                 script {
                     def changedModules = env.CHANGED_MODULES.split(',')
+
+                    // module-common은 모든 모듈의 의존성이므로 전부 빌드
                     if ("module-common" in changedModules) {
                         echo "Building module-common.."
                         sh "./gradlew :module-common:buildDependents"
@@ -66,6 +68,7 @@ pipeline {
                         return
                     }
 
+                    // module-security는 모든 모듈의 의존성이므로 전부 빌드
                     if ("module-security" in changedModules) {
                         echo "Building module-security.."
                         sh "./gradlew :module-security:buildDependents"
@@ -74,6 +77,7 @@ pipeline {
                         return
                     }
 
+                    // 변경된 모듈만 빌드
                     for (module in env.CHANGED_MODULES.split(',')) {
                         echo "Building ${module}.."
                         sh "./gradlew :${module}:build"
@@ -90,11 +94,6 @@ pipeline {
                     def jarFiles = sh(script: 'find . -path "*/build/libs/*.jar" -not -name "*-plain.jar"', returnStdout: true).trim().split("\n")
                     env.JAR_FILES = jarFiles.join(',')
                 }
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
             }
         }
         stage('Deploy') {
