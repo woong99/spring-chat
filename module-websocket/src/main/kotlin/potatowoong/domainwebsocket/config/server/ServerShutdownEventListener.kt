@@ -43,7 +43,7 @@ class ServerShutdownEventListener(
         val ip = IpUtils.getLocalIp()
 
         // 로드밸런서에 서버 Down 상태 전달
-        val uri = UriComponentsBuilder.fromUriString(loadBalancerUrl)
+        val uri = UriComponentsBuilder.fromUriString("$loadBalancerUrl/ws-down")
             .queryParam("ip", ip)
             .queryParam("deploy", deploy)
             .build()

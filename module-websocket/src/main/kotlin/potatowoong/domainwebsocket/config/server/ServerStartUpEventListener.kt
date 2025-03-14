@@ -25,7 +25,7 @@ class ServerStartUpEventListener(
         val ip = IpUtils.getLocalIp()
 
         // 로드밸런서에 서버 Up 상태 전달
-        val uri = UriComponentsBuilder.fromUriString(loadBalancerUrl)
+        val uri = UriComponentsBuilder.fromUriString("$loadBalancerUrl/ws-up")
             .queryParam("ip", ip)
             .queryParam("deploy", deploy)
             .build()
