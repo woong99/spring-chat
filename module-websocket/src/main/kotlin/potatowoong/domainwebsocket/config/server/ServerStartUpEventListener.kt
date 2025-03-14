@@ -6,25 +6,28 @@ import org.springframework.context.ApplicationListener
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import java.net.NetworkInterface
+import org.springframework.web.util.UriComponentsBuilder
+import potatowoong.domainwebsocket.common.utils.IpUtils
 
 
 @Component
 @Profile("prod")
 class ServerStartUpEventListener(
-    @Value("\${load-balancer-url}")
-    private val loadBalancerUrl: String,
-    private val restTemplate: RestTemplate
+    @Value("\${load-balancer-url}") private val loadBalancerUrl: String,
+    @Value("\${deploy}") private val deploy: String,
+    private val restTemplate: RestTemplate,
 ) : ApplicationListener<ApplicationReadyEvent> {
 
     override fun onApplicationEvent(event: ApplicationReadyEvent) {
         // 컨테이너 IP 획득
-        val ip = NetworkInterface.getNetworkInterfaces().toList()
-            .flatMap { it.inetAddresses.toList() }
-            .first { it.isSiteLocalAddress }
-            .hostAddress
+        val ip = IpUtils.getLocalIp()
 
         // 로드밸런서에 서버 Up 상태 전달
-        restTemplate.getForObject("$loadBalancerUrl/ws-up?ip=$ip", String::class.java)
+        val uri = UriComponentsBuilder.fromUriString("$loadBalancerUrl/ws-up")
+            .queryParam("ip", ip)
+            .queryParam("deploy", deploy)
+            .build()
+            .toUriString()
+        restTemplate.getForObject(uri, String::class.java)
     }
 }
