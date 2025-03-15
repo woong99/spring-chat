@@ -40,10 +40,14 @@
 
 ## ⚙️ 인프라
 
-<img src="./assets/infra-v4.0.png" alt="인프라">
+<img src="./assets/infra-v5.0.png" alt="인프라">
 
 <br>
 <br>
+<details>
+<summary>v4.0 인프라</summary>
+<img src="./assets/infra-v4.0.png" alt="인프라">
+</details>
 <details>
 <summary>v3.0 인프라</summary>
 <img src="./assets/infra-v3.0.png" alt="인프라">
@@ -63,7 +67,7 @@
 
 ---
 
-## 업데이트 내역
+## 🗒️ 업데이트 내역
 
 ### v1.0
 
@@ -96,3 +100,23 @@
 - 채팅 관련 데이터 MariaDB -> MongoDB로 변경
 - 채팅 내역 조회 시 무한 스크롤 적용
 - SSE + WebFlux를 이용해 채팅 실시간 알림 구현
+
+### v5.0
+
+- OpenResty, Eureka Server, Jenkins를 통한 웹소켓 서버 Blue/Green 무중단 배포 구현
+
+---
+
+## 📝 블로그 정리
+
+### 프로젝트 개발 일지
+
+[Spring Boot 실시간 채팅 서버 구현 (1) - Stomp](https://woong99.tistory.com/25)<br>
+[Spring Boot 실시간 채팅 서버 구현 (2) - WAS 이중화](https://woong99.tistory.com/27)<br>
+[Spring Boot 실시간 채팅 서버 구현 (3) - MongoDB](https://woong99.tistory.com/28)<br>
+[Spring Boot 실시간 채팅 서버 구현 (4) - RabbitMQ](https://woong99.tistory.com/29)<br>
+
+### 학습 내용
+
+[AMQP란?](https://woong99.tistory.com/26)<br>
+
