@@ -3,12 +3,12 @@ spring:
     name: module-eureka
 
 server:
-  port: 8761
+  port: 8761 # 관례상 8761 포트 사용
 
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: false # Eureka Server 자체는 Eureka Server에 등록하지 않음
+    fetch-registry: false # Eureka Server 자체는 Eureka Server의 정보를 가져오지 않음
   server:
     response-cache-update-interval-ms: 5000 # 캐시 갱신 주기
-  helper-url: enc*(e7ANdMjug9ITc54CXGvq3n96l07SDIJSIF1eft2nWg18UitvpnhtQMB+BXMovrY9)
+  helper-url: ENC(e7ANdMjug9ITc54CXGvq3n96l07SDIJSIF1eft2nWg18UitvpnhtQMB+BXMovrY9)
