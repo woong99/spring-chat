@@ -115,6 +115,7 @@
 [Spring Boot 실시간 채팅 서버 구현 (2) - WAS 이중화](https://woong99.tistory.com/27)<br>
 [Spring Boot 실시간 채팅 서버 구현 (3) - MongoDB](https://woong99.tistory.com/28)<br>
 [Spring Boot 실시간 채팅 서버 구현 (4) - RabbitMQ](https://woong99.tistory.com/29)<br>
+[Spring Boot 실시간 채팅 서버 구현 (5) - WebSocket 무중단 배포](https://woong99.tistory.com/31)<br>
 
 ### 학습 내용
 
