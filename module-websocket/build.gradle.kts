@@ -30,4 +30,8 @@ dependencies {
 
     // P6Spy
     implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.2")
+
+    // Monitoring
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 }
