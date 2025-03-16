@@ -81,6 +81,8 @@ class SecurityConfig(
         // 허용 URL
         private val PERMIT_ALL = arrayOf(
             "/ws-stomp/**",
+            "/actuator/**",
+            "/metric/**"
         )
     }
 }
