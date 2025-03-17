@@ -15,15 +15,36 @@ class ChatRoomRepositoryCustomImpl(
 ) : ChatRoomRepositoryCustom {
 
     override fun findMyChatRooms(memberId: Long): List<MyChatRoomsDto> {
-        // memberId로 채팅방 멤버 필터링
-        val matchOperation = Aggregation.match(
-            Criteria.where("memberId").`in`(memberId)
-        )
+        // memberId로 채팅방 필터링
+        val chatRoomMemberLookupOperation = Aggregation.lookup()
+            .from("chat_room_member")
+            .localField("_id")
+            .foreignField("chatRoomId")
+            .let(VariableOperators.Let.ExpressionVariable.newVariable("chatRoomId").forField("_id"))
+            .pipeline(
+                Aggregation.match(
+                    Criteria.where("memberId").`is`(memberId)
+                )
+            )
+            .`as`("chat_room_member")
+
+        val chatRoomMemberUnwindOperation = Aggregation.unwind("chat_room_member", false)
+
+        // 채팅방 인원 조회
+        val participantCountLookupOperation = Aggregation.lookup()
+            .from("chat_room_member")
+            .localField("_id")
+            .foreignField("chatRoomId")
+            .`as`("chat_room_members")
+
+        val participantCountAddFieldsOperation = Aggregation.addFields()
+            .addFieldWithValue("participantCount", Size.lengthOfArray("chat_room_members"))
+            .build()
 
         // 마지막 메시지 조회
-        val chatMessageLookupOperation = Aggregation.lookup()
+        val lastMessageLookupOperation = Aggregation.lookup()
             .from("chat")
-            .localField("chatRoomId")
+            .localField("_id")
             .foreignField("chatRoomId")
             .pipeline(
                 Aggregation.sort(
@@ -36,7 +57,6 @@ class ChatRoomRepositoryCustomImpl(
                     Fields.from(
                         Fields.field("content", "content"),
                         Fields.field("sendAt", "sendAt"),
-                        Fields.field("chatRoomId", "chatRoomId")
                     )
                 )
             )
@@ -44,38 +64,16 @@ class ChatRoomRepositoryCustomImpl(
 
         val lastMessageUnwindOperation = Aggregation.unwind("last_message", true)
 
-        // 채팅방 조회
-        val chatRoomLookupOperation = Aggregation.lookup()
-            .from("chat_room")
-            .localField("chatRoomId")
-            .foreignField("_id")
-            .`as`("chat_rooms")
-
-        val chatRoomUnwindOperation = Aggregation.unwind("chat_rooms", true)
-
-        // 채팅방 인원 조회
-        val participantCountLookupOperation = Aggregation.lookup()
-            .from("chat_room_member")
-            .localField("chatRoomId")
-            .foreignField("chatRoomId")
-            .`as`("chat_room_members")
-
-        val participantCountAddFieldsOperation = Aggregation.addFields()
-            .addFieldWithValue("participantCount", Size.lengthOfArray("chat_room_members"))
-            .build()
-
         // 안읽은 메시지 수 조회
         val unreadMessageCountLookupOperation = Aggregation.lookup()
             .from("chat")
-            .localField("chatRoomId")
+            .localField("_id")
             .foreignField("chatRoomId")
-            .let(VariableOperators.Let.ExpressionVariable.newVariable("last_joined_at").forField("lastJoinedAt"))
+            .let(
+                VariableOperators.Let.ExpressionVariable.newVariable("last_joined_at")
+                    .forField("chat_room_member.lastJoinedAt")
+            )
             .pipeline(
-                Aggregation.sort(
-                    Sort.by(
-                        Sort.Order.desc("sendAt")
-                    )
-                ),
                 Aggregation.match(
                     Criteria.expr(MongoExpression.create("{\$gt: [\"\$sendAt\", \"\$\$last_joined_at\"]}"))
                 ),
@@ -101,10 +99,10 @@ class ChatRoomRepositoryCustomImpl(
 
         val projectOperation = Aggregation.project(
             Fields.from(
-                Fields.field("chatRoomId", "chatRoomId"),
+                Fields.field("chatRoomId", "_id"),
                 Fields.field("lastMessage", "last_message.content"),
                 Fields.field("lastSendAt", "last_message.sendAt"),
-                Fields.field("chatRoomName", "chat_rooms.name"),
+                Fields.field("chatRoomName", "name"),
                 Fields.field("participantCount", "participantCount"),
                 Fields.field("unreadMessageCount", "unreadMessageCount")
             )
@@ -112,13 +110,12 @@ class ChatRoomRepositoryCustomImpl(
 
         val aggregation =
             Aggregation.newAggregation(
-                matchOperation,
-                chatMessageLookupOperation,
-                lastMessageUnwindOperation,
-                chatRoomLookupOperation,
-                chatRoomUnwindOperation,
+                chatRoomMemberLookupOperation,
+                chatRoomMemberUnwindOperation,
                 participantCountLookupOperation,
                 participantCountAddFieldsOperation,
+                lastMessageLookupOperation,
+                lastMessageUnwindOperation,
                 unreadMessageCountLookupOperation,
                 unreadMessageCountAddFieldsOperation,
                 sortOperation,
@@ -128,7 +125,7 @@ class ChatRoomRepositoryCustomImpl(
 
         return mongoTemplate.aggregate(
             aggregation,
-            "chat_room_member",
+            "chat_room",
             MyChatRoomsDto::class.java
         ).mappedResults
     }
