@@ -5,11 +5,11 @@ spring:
       on-profile: local
   data:
     mongodb:
-      host: localhost
+      host: ENC(KDai+Hq1Qk+odiQOQO7sF/9y2kP6/voM/Iqu7R/iEc0=)
       port: 27017
       database: spring_chat
-      username: root
-      password: root!))$
+      username: ENC(geXy4NXdWspEa44JeX24Bw==)
+      password: ENC(BCN7yw3+rmjFh2osdWTY+Ws8RIFpp87B)
       authentication-database: admin
 
 ---
@@ -22,6 +22,6 @@ spring:
       host: mongodb
       port: 27017
       database: spring_chat
-      username: root
-      password: root!))$
+      username: ENC(ZIeSB0azmX0DanW+PnxWsQ==)
+      password: ENC(TGTV27qA6G1KCfKf+O25XK3PGUUSkQ/7)
       authentication-database: admin

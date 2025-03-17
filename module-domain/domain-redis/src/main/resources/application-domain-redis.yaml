@@ -5,7 +5,7 @@ spring:
       on-profile: local
   data:
     redis:
-      host: localhost
+      host: ENC(gU9ZfcoDfB7XWEHHAK751d8V5V3H0cZVrWW0X0WscgA=)
       port: 6379
 
 ---
