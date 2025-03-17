@@ -1,4 +1,4 @@
-package potatowoong.domainwebsocket.config.jasypt
+package potatowoong.moduleapi.config.jasypt
 
 import org.jasypt.encryption.StringEncryptor
 import org.jasypt.encryption.pbe.PooledPBEStringEncryptor
