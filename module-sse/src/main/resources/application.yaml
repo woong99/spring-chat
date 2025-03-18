@@ -14,7 +14,7 @@ spring:
     activate:
       on-profile: local
   kafka:
-    bootstrap-servers: localhost:13302
+    bootstrap-servers: ENC(Ztjw+261SOpHag+TEEAxpnYxczh99OIunHhyzzkWeMU=)
     consumer:
       group-id: 1
 logging:
@@ -26,7 +26,7 @@ spring:
     activate:
       on-profile: prod
   kafka:
-    bootstrap-servers: kafka:13302
+    bootstrap-servers: ENC(Ztjw+261SOpHag+TEEAxpnYxczh99OIunHhyzzkWeMU=)
     consumer:
       group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
 logging:

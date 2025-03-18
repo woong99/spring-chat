@@ -49,6 +49,7 @@ class SecurityConfig(
         http
             .authorizeExchange {
                 it.pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                it.pathMatchers(*PERMIT_ALL).permitAll()
                 it.anyExchange().authenticated()
             }
 
@@ -91,10 +92,16 @@ class SecurityConfig(
             if (token != null && token.startsWith("Bearer ")) {
                 val authentication = jwtTokenProvider.getAuthentication(token.substring(7))
                 SecurityContextHolder.getContext().authentication = authentication
-                
+
                 return@ServerAuthenticationConverter Mono.just(authentication)
             }
             Mono.empty()
         }
+    }
+
+    companion object {
+        private val PERMIT_ALL = arrayOf(
+            "/actuator/**"
+        )
     }
 }
