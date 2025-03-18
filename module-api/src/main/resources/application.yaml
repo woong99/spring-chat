@@ -9,6 +9,18 @@ spring:
       - domain-redis
       - security
 
+cloud:
+  aws:
+    s3:
+      bucket: spring-10k-chat
+      region.static: ENC(eyAxwZTCHN/KiMWbgJmTPZQSnAkCDIa8)
+      stack.auto: false
+      credentials:
+        access-key: ENC(xXPKI63zuX3jIdWEiDL1j6iGHop4DgPHY4nt8DEniU0=)
+        secret-key: ENC(+1ajM+OvZkkPTPQpkG78NN4ZF39KxyGtlKwhiV6xnsyx+CSN6bVe8F+7z2NDVEzwBTOyu2wa0eI=)
+      url: ENC(eeU7dYD35Y/adW5aDygBUlGybzwQCtEgq7Dc95shULWcfX4r0ffyBiAISNiRQmC3Px8m6qp8OpAcAVldfeZ0oQ==)
+file:
+  image-extensions: jpg,jpeg,png,heic
 ---
 spring:
   config:
