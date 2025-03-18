@@ -6,10 +6,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import potatowoong.domainrdb.domains.auth.repository.MemberRepository
 import potatowoong.moduleapi.api.auth.dto.LoginDto
 import potatowoong.moduleapi.api.auth.dto.MemberDto
 import potatowoong.moduleapi.api.auth.dto.SignupDto
+import potatowoong.moduleapi.api.file.components.FileUtils
+import potatowoong.moduleapi.api.file.enums.S3Folder
 import potatowoong.moduleapi.common.exception.ErrorCode
 import potatowoong.modulecommon.exception.CustomException
 import potatowoong.modulesecurity.auth.enums.Role
@@ -21,7 +24,8 @@ import potatowoong.modulesecurity.utils.SecurityUtils
 class AuthService(
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val fileUtils: FileUtils
 ) {
 
     @Transactional
@@ -72,10 +76,58 @@ class AuthService(
     @Transactional(readOnly = true)
     fun getMyInfo(
         memberId: Long? = SecurityUtils.getCurrentUserId()
-    ): MemberDto {
-        return MemberDto.of(
+    ): MemberDto.Response {
+        return MemberDto.Response.of(
             memberRepository.findByIdOrNull(memberId)
                 ?: throw CustomException(ErrorCode.UNAUTHORIZED)
         )
+    }
+
+    @Transactional
+    fun modifyMyInfo(
+        request: MemberDto.UpdateRequest,
+        profileImage: MultipartFile?
+    ) {
+        // 사용자 정보 조회
+        val member = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
+            ?: throw CustomException(ErrorCode.UNAUTHORIZED)
+
+        // 닉네임 중복 체크
+        checkSameNickname(request.nickname, member.id!!)
+
+        // 이미지 업로드
+        val s3Url = uploadProfileImage(profileImage)
+
+        // 사용자 정보 수정
+        member.modifyInfo(s3Url, request.nickname, request.introduction, request.defaultImageFlag)
+    }
+
+    /**
+     * 닉네임 중복 체크
+     *
+     * @param nickname 변경하려는 닉네임
+     * @param memberId 사용자 ID
+     */
+    private fun checkSameNickname(
+        nickname: String,
+        memberId: Long
+    ) {
+        val sameNicknameMember = memberRepository.findByNickname(nickname)
+        if (sameNicknameMember != null && sameNicknameMember.id != memberId) {
+            throw CustomException(ErrorCode.EXISTED_NICKNAME)
+        }
+    }
+
+    /**
+     * 프로필 이미지 업로드
+     *
+     * @param profileImage 프로필 이미지
+     * @return S3 URL
+     */
+    private fun uploadProfileImage(
+        profileImage: MultipartFile?
+    ): String? {
+        return profileImage?.takeIf { !it.isEmpty }
+            ?.let { fileUtils.uploadImage(profileImage, S3Folder.PROFILE_IMAGE) }
     }
 }

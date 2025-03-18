@@ -12,4 +12,6 @@ interface MemberRepository : JpaRepository<Member, Long> {
     fun findByUserId(userId: String): Member?
 
     fun findByIdIn(ids: List<Long>): List<Member>
+
+    fun findByNickname(nickname: String): Member?
 }

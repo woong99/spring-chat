@@ -8,7 +8,11 @@ spring:
       - domain-mongo
       - domain-redis
       - security
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 cloud:
   aws:
     s3:
@@ -21,6 +25,7 @@ cloud:
       url: ENC(eeU7dYD35Y/adW5aDygBUlGybzwQCtEgq7Dc95shULWcfX4r0ffyBiAISNiRQmC3Px8m6qp8OpAcAVldfeZ0oQ==)
 file:
   image-extensions: jpg,jpeg,png,heic
+  image-size: 5 # MB
 ---
 spring:
   config:

@@ -1,8 +1,10 @@
 package potatowoong.moduleapi.api.auth.controller
 
 import jakarta.validation.Valid
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import potatowoong.moduleapi.api.auth.dto.LoginDto
 import potatowoong.moduleapi.api.auth.dto.MemberDto
 import potatowoong.moduleapi.api.auth.dto.SignupDto
@@ -42,7 +44,20 @@ class AuthController(
      * 내 정보 조회 API
      */
     @GetMapping("/me")
-    fun me(): ResponseEntity<ApiResponse<MemberDto>> {
+    fun me(): ResponseEntity<ApiResponse<MemberDto.Response>> {
         return ApiResponse.success(authService.getMyInfo())
+    }
+
+    /**
+     * 내 정보 수정 API
+     */
+    @PutMapping(value = ["/me"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun updateMyInfo(
+        @Valid @RequestPart request: MemberDto.UpdateRequest,
+        @RequestPart("profileImage") profileImage: MultipartFile?,
+    ): ResponseEntity<ApiResponse<Unit>> {
+        authService.modifyMyInfo(request, profileImage)
+        
+        return ApiResponse.success()
     }
 }
