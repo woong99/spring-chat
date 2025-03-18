@@ -19,7 +19,11 @@ enum class ErrorCode(
     INCORRECT_ID_OR_PASSWORD(HttpStatus.BAD_REQUEST.value(), "AU003", "아이디 또는 비밀번호가 일치하지 않습니다."),
 
     NOT_FOUND_CHAT_ROOM(HttpStatus.NOT_FOUND.value(), "CR001", "존재하지 않는 채팅방입니다."),
-    NOT_FOUND_ENTER_CHAT_ROOM(HttpStatus.NOT_FOUND.value(), "CR002", "입장한 채팅방이 존재하지 않습니다."), ;
+    NOT_FOUND_ENTER_CHAT_ROOM(HttpStatus.NOT_FOUND.value(), "CR002", "입장한 채팅방이 존재하지 않습니다."),
+
+    NOT_ALLOWED_FILE_EXTENSION(HttpStatus.BAD_REQUEST.value(), "FI001", "허용되지 않는 파일 확장자입니다."),
+    NOT_ALLOWED_FILE_SIZE(HttpStatus.BAD_REQUEST.value(), "FI002", "허용되지 않는 파일 크기입니다."),
+    EMPTY_FILE(HttpStatus.BAD_REQUEST.value(), "FI003", "파일이 비어있습니다.");
 
     override fun getErrorName(): String {
         return this.name
