@@ -68,10 +68,10 @@ class ChatRoomService(
             .flatMap { it.memberIds }
             .filter { it != SecurityUtils.getCurrentUserId() }
             .distinct()
-        
+
         // 친구 ID에 해당하는 친구 닉네임 조회
         val friendNicknameMap = memberRepository.findByIdIn(friendIds)
-            .associateBy({ it.id!! }, { it.nickname })
+            .associateBy { it.id!! }
 
         // 현재 참여중인 채팅방인 경우 안읽은 메시지 수 0으로 변경(다른 화면으로 채팅을 보고 있는 경우를 처리하기 위한 코드)
         val myChatRoomsMap = myChatRooms.associateBy { it.chatRoomId }
