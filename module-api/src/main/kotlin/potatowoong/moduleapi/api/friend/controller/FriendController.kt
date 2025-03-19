@@ -3,6 +3,7 @@ package potatowoong.moduleapi.api.friend.controller
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import potatowoong.domainrdb.domains.auth.dto.SearchFriendDto
+import potatowoong.domainrdb.domains.auth.enums.FriendshipStatusFilter
 import potatowoong.moduleapi.api.friend.dto.FriendDto
 import potatowoong.moduleapi.api.friend.service.FriendService
 import potatowoong.moduleapi.common.api.ApiResponse
@@ -20,8 +21,9 @@ class FriendController(
     fun getFriends(
         @RequestParam("page", defaultValue = "0") page: Long,
         @RequestParam("searchQuery") searchQuery: String?,
+        @RequestParam("filter") filter: FriendshipStatusFilter?
     ): ResponseEntity<ApiResponse<SearchFriendDto.Response>> {
-        return ApiResponse.success(friendService.searchAllFriends(page, searchQuery))
+        return ApiResponse.success(friendService.searchAllFriends(page, searchQuery, filter))
     }
 
     /**

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import potatowoong.domainrdb.domains.auth.dto.SearchFriendDto
 import potatowoong.domainrdb.domains.auth.entity.Friendship
+import potatowoong.domainrdb.domains.auth.enums.FriendshipStatusFilter
 import potatowoong.domainrdb.domains.auth.repository.FriendshipRepository
 import potatowoong.domainrdb.domains.auth.repository.MemberRepository
 import potatowoong.moduleapi.api.friend.dto.FriendDto
@@ -22,12 +23,13 @@ class FriendService(
     fun searchAllFriends(
         page: Long,
         searchQuery: String?,
+        filter: FriendshipStatusFilter?
     ): SearchFriendDto.Response {
         // 내 정보 조회
         val myInfo = memberRepository.findByIdOrNull(SecurityUtils.getCurrentUserId())
             ?: throw CustomException(ErrorCode.UNAUTHORIZED)
 
-        return memberRepository.searchAllFriends(page, searchQuery, myInfo.id!!)
+        return memberRepository.searchAllFriends(page, searchQuery, filter, myInfo.id!!)
     }
 
     @Transactional

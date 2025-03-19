@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import potatowoong.domainrdb.domains.auth.dto.SearchFriendDto
 import potatowoong.domainrdb.domains.auth.entity.QFriendship.friendship
 import potatowoong.domainrdb.domains.auth.entity.QMember.member
+import potatowoong.domainrdb.domains.auth.enums.FriendshipStatusFilter
 import potatowoong.modulesecurity.utils.SecurityUtils
 
 class MemberRepositoryCustomImpl(
@@ -15,6 +16,7 @@ class MemberRepositoryCustomImpl(
     override fun searchAllFriends(
         page: Long,
         searchQuery: String?,
+        filter: FriendshipStatusFilter?,
         userId: Long
     ): SearchFriendDto.Response {
         val result = queryFactory.select(
@@ -31,7 +33,7 @@ class MemberRepositoryCustomImpl(
             .on(member.id.eq(friendship.friend.id).and(friendship.member.id.eq(SecurityUtils.getCurrentUserId())))
             .where(
                 member.id.ne(userId)
-                    .and(getSearchConditions(searchQuery))
+                    .and(getSearchConditions(searchQuery, filter))
             )
             .limit(21)
             .offset(page * 20)
@@ -44,12 +46,20 @@ class MemberRepositoryCustomImpl(
         )
     }
 
-    private fun getSearchConditions(searchQuery: String?): BooleanBuilder {
+    private fun getSearchConditions(
+        searchQuery: String?,
+        filter: FriendshipStatusFilter?
+    ): BooleanBuilder {
         val builder = BooleanBuilder()
 
         // 닉네임 검색
         if (!searchQuery.isNullOrBlank()) {
             builder.and(member.nickname.contains(searchQuery))
+        }
+
+        // 친구 상태 필터
+        if (filter != null && filter != FriendshipStatusFilter.ALL) {
+            builder.and(friendship.friendshipStatus.eq(filter.getFriendshipStatus()))
         }
 
         return builder
