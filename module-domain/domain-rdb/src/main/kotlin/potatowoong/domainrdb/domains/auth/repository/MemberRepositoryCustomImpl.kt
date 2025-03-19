@@ -4,7 +4,9 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Projections
 import com.querydsl.jpa.impl.JPAQueryFactory
 import potatowoong.domainrdb.domains.auth.dto.SearchFriendDto
+import potatowoong.domainrdb.domains.auth.entity.QFriendship.friendship
 import potatowoong.domainrdb.domains.auth.entity.QMember.member
+import potatowoong.modulesecurity.utils.SecurityUtils
 
 class MemberRepositoryCustomImpl(
     private val queryFactory: JPAQueryFactory
@@ -21,9 +23,12 @@ class MemberRepositoryCustomImpl(
                 member.id,
                 member.nickname,
                 member.introduction,
-                member.profileImageUrl
+                member.profileImageUrl,
+                friendship.friendshipStatus
             )
         ).from(member)
+            .leftJoin(friendship)
+            .on(member.id.eq(friendship.friend.id).and(friendship.member.id.eq(SecurityUtils.getCurrentUserId())))
             .where(
                 member.id.ne(userId)
                     .and(getSearchConditions(searchQuery))

@@ -1,6 +1,6 @@
 package potatowoong.domainrdb.domains.auth.dto
 
-import potatowoong.domainrdb.domains.auth.entity.Member
+import potatowoong.domainrdb.domains.auth.enums.FriendshipStatus
 
 class SearchFriendDto {
 
@@ -14,18 +14,8 @@ class SearchFriendDto {
             val nickname: String,
             val introduction: String?,
             val profileImageUrl: String?,
-        ) {
-            companion object {
-                fun of(
-                    member: Member
-                ) = Friend(
-                    id = member.id!!,
-                    nickname = member.nickname,
-                    introduction = member.introduction,
-                    profileImageUrl = member.profileImageUrl
-                )
-            }
-        }
+            val friendshipStatus: FriendshipStatus?
+        )
 
         companion object {
             fun of(

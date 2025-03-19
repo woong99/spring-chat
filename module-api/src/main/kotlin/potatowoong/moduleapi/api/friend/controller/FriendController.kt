@@ -1,11 +1,9 @@
 package potatowoong.moduleapi.api.friend.controller
 
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import potatowoong.domainrdb.domains.auth.dto.SearchFriendDto
+import potatowoong.moduleapi.api.friend.dto.FriendDto
 import potatowoong.moduleapi.api.friend.service.FriendService
 import potatowoong.moduleapi.common.api.ApiResponse
 
@@ -24,5 +22,17 @@ class FriendController(
         @RequestParam("searchQuery") searchQuery: String?,
     ): ResponseEntity<ApiResponse<SearchFriendDto.Response>> {
         return ApiResponse.success(friendService.searchAllFriends(page, searchQuery))
+    }
+
+    /**
+     * 친구 상태 변경 API
+     */
+    @PutMapping("/status")
+    fun changeFriendStatus(
+        @RequestBody request: FriendDto.ChangeFriendStatusRequest
+    ): ResponseEntity<ApiResponse<Unit>> {
+        friendService.changeFriendStatus(request)
+
+        return ApiResponse.success()
     }
 }

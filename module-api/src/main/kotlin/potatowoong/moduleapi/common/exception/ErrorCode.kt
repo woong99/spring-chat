@@ -23,7 +23,9 @@ enum class ErrorCode(
 
     NOT_ALLOWED_FILE_EXTENSION(HttpStatus.BAD_REQUEST.value(), "FI001", "허용되지 않는 파일 확장자입니다."),
     NOT_ALLOWED_FILE_SIZE(HttpStatus.BAD_REQUEST.value(), "FI002", "허용되지 않는 파일 크기입니다."),
-    EMPTY_FILE(HttpStatus.BAD_REQUEST.value(), "FI003", "파일이 비어있습니다.");
+    EMPTY_FILE(HttpStatus.BAD_REQUEST.value(), "FI003", "파일이 비어있습니다."),
+
+    NOT_FOUND_FRIEND(HttpStatus.NOT_FOUND.value(), "FR001", "존재하지 않는 친구입니다."), ;
 
     override fun getErrorName(): String {
         return this.name
