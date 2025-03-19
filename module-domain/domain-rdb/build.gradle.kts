@@ -22,6 +22,7 @@ allOpen {
 
 dependencies {
     implementation(project(":module-common"))
+    implementation(project(":module-security"))
 
     // Spring Data JPA
     api("org.springframework.boot:spring-boot-starter-data-jpa")

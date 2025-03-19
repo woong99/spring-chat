@@ -15,7 +15,7 @@ class JpaConfig(
 ) {
 
     @Bean
-    fun auditorAware(): AuditorAware<Long> {
+    fun auditorAware(): AuditorAware<String> {
         return AuditorAwareImpl()
     }
 }

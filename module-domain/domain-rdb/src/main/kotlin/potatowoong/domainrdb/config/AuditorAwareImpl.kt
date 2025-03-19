@@ -1,18 +1,18 @@
 package potatowoong.domainrdb.config
 
 import org.springframework.data.domain.AuditorAware
+import org.springframework.security.core.context.SecurityContextHolder
 import java.util.*
 
-class AuditorAwareImpl : AuditorAware<Long> {
+class AuditorAwareImpl : AuditorAware<String> {
 
-    override fun getCurrentAuditor(): Optional<Long> {
-//        val authentication = SecurityContextHolder.getContext().authentication
+    override fun getCurrentAuditor(): Optional<String> {
+        val authentication = SecurityContextHolder.getContext().authentication
 
-//        if (authentication == null || !authentication.isAuthenticated || authentication.name == "anonymousUser") {
-//            return Optional.of(0L)
-//        }
+        if (authentication == null || !authentication.isAuthenticated || authentication.name == "anonymousUser") {
+            return Optional.of("SYSTEM")
+        }
 
-//        return Optional.of(authentication.name.toLong())
-        return Optional.of(0L)
+        return Optional.of(authentication.name)
     }
 }
