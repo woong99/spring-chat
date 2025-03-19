@@ -5,9 +5,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import potatowoong.domainmongo.domains.chat.dto.ChatRoomIdDto
-import potatowoong.domainmongo.domains.chat.dto.MyChatRoomsDto
 import potatowoong.domainmongo.domains.chat.entity.ChatRoom
 import potatowoong.domainmongo.domains.chat.entity.ChatRoomMember
+import potatowoong.domainmongo.domains.chat.enums.ChatRoomType
 import potatowoong.domainmongo.domains.chat.repository.ChatRoomMemberRepository
 import potatowoong.domainmongo.domains.chat.repository.ChatRoomRepository
 import potatowoong.domainrdb.domains.auth.repository.MemberRepository
@@ -58,19 +58,32 @@ class ChatRoomService(
     }
 
     @Transactional(readOnly = true)
-    fun getMyChatRooms(): List<MyChatRoomsDto> {
+    fun getMyChatRooms(): List<ChatRoomDto.Response> {
         // 내 채팅방 목록 조회
         val myChatRooms = chatRoomRepository.findMyChatRooms(SecurityUtils.getCurrentUserId())
-        val myChatRoomsMap = myChatRooms.associateBy { it.chatRoomId }
 
-        // 현재 참여중인 채팅방인 경우 안읽은 메시지 수 0으로 변경
+        // 친구 ID 목록 파싱
+        val friendIds = myChatRooms
+            .filter { it.chatRoomType == ChatRoomType.PRIVATE }
+            .flatMap { it.memberIds }
+            .filter { it != SecurityUtils.getCurrentUserId() }
+            .distinct()
+        
+        // 친구 ID에 해당하는 친구 닉네임 조회
+        val friendNicknameMap = memberRepository.findByIdIn(friendIds)
+            .associateBy({ it.id!! }, { it.nickname })
+
+        // 현재 참여중인 채팅방인 경우 안읽은 메시지 수 0으로 변경(다른 화면으로 채팅을 보고 있는 경우를 처리하기 위한 코드)
+        val myChatRoomsMap = myChatRooms.associateBy { it.chatRoomId }
         redisUtils.getDataFromSet(SecurityUtils.getCurrentUserId().toString())?.let { chatRoomIds ->
             chatRoomIds.forEach { chatRoomId ->
                 myChatRoomsMap[chatRoomId.toString().split("-")[0]]?.markAllMessageAsRead()
             }
         }
 
-        return myChatRooms
+        return myChatRooms.map {
+            ChatRoomDto.Response.of(it, friendNicknameMap)
+        }
     }
 
     @Transactional

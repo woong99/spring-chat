@@ -103,11 +103,13 @@ class ChatRoomRepositoryCustomImpl(
         val projectOperation = Aggregation.project(
             Fields.from(
                 Fields.field("chatRoomId", "_id"),
+                Fields.field("chatRoomType", "chatRoomType"),
                 Fields.field("lastMessage", "last_message.content"),
                 Fields.field("lastSendAt", "last_message.sendAt"),
                 Fields.field("chatRoomName", "name"),
                 Fields.field("participantCount", "participantCount"),
-                Fields.field("unreadMessageCount", "unreadMessageCount")
+                Fields.field("unreadMessageCount", "unreadMessageCount"),
+                Fields.field("memberIds", "chat_room_members.memberId")
             )
         )
 

@@ -4,7 +4,6 @@ import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import potatowoong.domainmongo.domains.chat.dto.ChatRoomIdDto
-import potatowoong.domainmongo.domains.chat.dto.MyChatRoomsDto
 import potatowoong.moduleapi.api.chat.dto.AllChatRoomsDto
 import potatowoong.moduleapi.api.chat.dto.ChatRoomDto
 import potatowoong.moduleapi.api.chat.service.ChatRoomService
@@ -40,7 +39,7 @@ class ChatRoomController(
      * 채팅방 목록 조회 API
      */
     @GetMapping("/my-list")
-    fun getChatRooms(): ResponseEntity<ApiResponse<List<MyChatRoomsDto>>> {
+    fun getChatRooms(): ResponseEntity<ApiResponse<List<ChatRoomDto.Response>>> {
         return ApiResponse.success(chatRoomService.getMyChatRooms())
     }
 
