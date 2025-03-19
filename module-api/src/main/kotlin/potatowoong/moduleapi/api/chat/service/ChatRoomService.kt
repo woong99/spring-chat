@@ -4,7 +4,9 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import potatowoong.domainmongo.domains.chat.dto.ChatRoomIdDto
 import potatowoong.domainmongo.domains.chat.dto.MyChatRoomsDto
+import potatowoong.domainmongo.domains.chat.entity.ChatRoom
 import potatowoong.domainmongo.domains.chat.entity.ChatRoomMember
 import potatowoong.domainmongo.domains.chat.repository.ChatRoomMemberRepository
 import potatowoong.domainmongo.domains.chat.repository.ChatRoomRepository
@@ -69,5 +71,33 @@ class ChatRoomService(
         }
 
         return myChatRooms
+    }
+
+    @Transactional
+    fun getPrivateChatRoomId(
+        friendId: Long
+    ): ChatRoomIdDto {
+        // 1대1 채팅방 있는지 조회
+        val chatRoomIdDto = chatRoomRepository.findPrivateChatRoomId(friendId)
+
+        return if (chatRoomIdDto == null) {
+            // 친구 정보 조회
+            val friendInfo = memberRepository.findByIdOrNull(friendId)
+                ?: throw CustomException(ErrorCode.NOT_FOUND_FRIEND)
+
+            // 1대1 채팅방 생성
+            val chatRoom = ChatRoom.createPrivateRoom()
+            val savedChatRoom = chatRoomRepository.save(chatRoom)
+
+            // 채팅방 멤버 생성
+            val myChatRoomMember = ChatRoomMember.of(savedChatRoom.id!!, SecurityUtils.getCurrentUserId())
+            val friendChatRoomMember = ChatRoomMember.of(savedChatRoom.id!!, friendInfo.id!!)
+            chatRoomMemberRepository.save(myChatRoomMember)
+            chatRoomMemberRepository.save(friendChatRoomMember)
+
+            ChatRoomIdDto.of(savedChatRoom)
+        } else {
+            chatRoomIdDto
+        }
     }
 }

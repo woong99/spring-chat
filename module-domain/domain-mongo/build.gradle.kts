@@ -20,6 +20,8 @@ jar.enabled = true
 //}
 
 dependencies {
+    implementation(project(":module-security"))
+
     // MongoDB
     api("org.springframework.boot:spring-boot-starter-data-mongodb")
 }

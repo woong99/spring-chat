@@ -3,12 +3,15 @@ package potatowoong.domainmongo.domains.chat.repository
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.MongoExpression
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.aggregate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.aggregation.ArrayOperators.Size
 import org.springframework.data.mongodb.core.aggregation.Fields
 import org.springframework.data.mongodb.core.aggregation.VariableOperators
 import org.springframework.data.mongodb.core.query.Criteria
+import potatowoong.domainmongo.domains.chat.dto.ChatRoomIdDto
 import potatowoong.domainmongo.domains.chat.dto.MyChatRoomsDto
+import potatowoong.modulesecurity.utils.SecurityUtils
 
 class ChatRoomRepositoryCustomImpl(
     private val mongoTemplate: MongoTemplate
@@ -128,5 +131,44 @@ class ChatRoomRepositoryCustomImpl(
             "chat_room",
             MyChatRoomsDto::class.java
         ).mappedResults
+    }
+
+    override fun findPrivateChatRoomId(friendId: Long): ChatRoomIdDto? {
+        // chat_room_member과 조인
+        val chatRoomMemberLookupOperation = Aggregation.lookup()
+            .from("chat_room_member")
+            .localField("_id")
+            .foreignField("chatRoomId")
+            .`as`("members")
+
+        // 1대1 채팅방인 경우 조회
+        val matchOperation = Aggregation.match(
+            Criteria().andOperator(
+                Criteria.where("members.memberId").all(
+                    listOf(
+                        SecurityUtils.getCurrentUserId(),
+                        friendId
+                    )
+                ),
+                Criteria.where("members").size(2)
+            )
+        )
+
+        val projectionOperation = Aggregation.project(
+            Fields.from(
+                Fields.field("chatRoomId", "_id"),
+            )
+        )
+
+        val aggregation = Aggregation.newAggregation(
+            chatRoomMemberLookupOperation,
+            matchOperation,
+            projectionOperation
+        )
+
+        return mongoTemplate.aggregate<ChatRoomIdDto>(
+            aggregation,
+            "chat_room",
+        ).mappedResults.firstOrNull()
     }
 }

@@ -3,6 +3,7 @@ package potatowoong.moduleapi.api.chat.controller
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import potatowoong.domainmongo.domains.chat.dto.ChatRoomIdDto
 import potatowoong.domainmongo.domains.chat.dto.MyChatRoomsDto
 import potatowoong.moduleapi.api.chat.dto.AllChatRoomsDto
 import potatowoong.moduleapi.api.chat.dto.ChatRoomDto
@@ -41,5 +42,15 @@ class ChatRoomController(
     @GetMapping("/my-list")
     fun getChatRooms(): ResponseEntity<ApiResponse<List<MyChatRoomsDto>>> {
         return ApiResponse.success(chatRoomService.getMyChatRooms())
+    }
+
+    /**
+     * 1대1 채팅방 ID 조회 API
+     */
+    @GetMapping("/private/{friendId}")
+    fun getPrivateChatRoomId(
+        @PathVariable("friendId") friendId: Long
+    ): ResponseEntity<ApiResponse<ChatRoomIdDto>> {
+        return ApiResponse.success(chatRoomService.getPrivateChatRoomId(friendId))
     }
 }
