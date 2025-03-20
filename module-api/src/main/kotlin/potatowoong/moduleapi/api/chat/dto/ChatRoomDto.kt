@@ -2,6 +2,7 @@ package potatowoong.moduleapi.api.chat.dto
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import potatowoong.domainmongo.domains.chat.dto.MyChatRoomsDto
 import potatowoong.domainmongo.domains.chat.entity.ChatRoom
 import potatowoong.domainmongo.domains.chat.enums.ChatRoomType
@@ -22,6 +23,11 @@ class ChatRoomDto {
             chatRoomType = ChatRoomType.GROUP
         )
     }
+
+    data class CreateGroupRequest(
+        @field:Size(min = 1, message = "채팅방 참여자는 최소 1명 이상이어야 합니다.") val friendIds: List<Long>,
+        @field:NotBlank(message = "채팅방 이름은 필수입니다.") val chatRoomName: String
+    )
 
     data class Response(
         val chatRoomId: String,

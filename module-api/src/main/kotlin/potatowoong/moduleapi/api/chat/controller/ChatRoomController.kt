@@ -52,4 +52,14 @@ class ChatRoomController(
     ): ResponseEntity<ApiResponse<ChatRoomIdDto>> {
         return ApiResponse.success(chatRoomService.getPrivateChatRoomId(friendId))
     }
+
+    /**
+     * 그룹 채팅방 생성 API
+     */
+    @PostMapping("/group")
+    fun addGroupChatRoom(
+        @Valid @RequestBody request: ChatRoomDto.CreateGroupRequest
+    ): ResponseEntity<ApiResponse<ChatRoomIdDto>> {
+        return ApiResponse.success(chatRoomService.addGroupChatRoom(request))
+    }
 }

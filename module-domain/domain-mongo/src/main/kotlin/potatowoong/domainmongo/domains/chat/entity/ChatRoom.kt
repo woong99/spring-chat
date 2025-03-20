@@ -19,5 +19,12 @@ class ChatRoom(
         fun createPrivateRoom() = ChatRoom(
             chatRoomType = ChatRoomType.PRIVATE
         )
+
+        fun createGroupRoom(
+            name: String
+        ) = ChatRoom(
+            name = name,
+            chatRoomType = ChatRoomType.GROUP
+        )
     }
 }

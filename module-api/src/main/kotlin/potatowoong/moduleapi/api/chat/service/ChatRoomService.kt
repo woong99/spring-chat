@@ -1,6 +1,7 @@
 package potatowoong.moduleapi.api.chat.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -10,6 +11,7 @@ import potatowoong.domainmongo.domains.chat.entity.ChatRoomMember
 import potatowoong.domainmongo.domains.chat.enums.ChatRoomType
 import potatowoong.domainmongo.domains.chat.repository.ChatRoomMemberRepository
 import potatowoong.domainmongo.domains.chat.repository.ChatRoomRepository
+import potatowoong.domainrdb.domains.auth.repository.FriendshipRepository
 import potatowoong.domainrdb.domains.auth.repository.MemberRepository
 import potatowoong.domainredis.utils.RedisUtils
 import potatowoong.moduleapi.api.chat.dto.AllChatRoomsDto
@@ -23,6 +25,7 @@ class ChatRoomService(
     private val chatRoomRepository: ChatRoomRepository,
     private val chatRoomMemberRepository: ChatRoomMemberRepository,
     private val memberRepository: MemberRepository,
+    private val friendshipRepository: FriendshipRepository,
     private val redisUtils: RedisUtils
 ) {
     private val log = KotlinLogging.logger { }
@@ -112,5 +115,42 @@ class ChatRoomService(
         } else {
             chatRoomIdDto
         }
+    }
+
+    @Transactional
+    fun addGroupChatRoom(
+        request: ChatRoomDto.CreateGroupRequest
+    ): ChatRoomIdDto {
+        // 친구 정보 조회
+        val friendInfos = friendshipRepository.findMyFriendIds(request.friendIds)
+        if (friendInfos.size != request.friendIds.size) {
+            throw CustomException(ErrorCode.NOT_FOUND_FRIEND)
+        }
+
+        // 채팅방 생성
+        val chatRoom = ChatRoom.createGroupRoom(request.chatRoomName)
+        val savedChatRoom = chatRoomRepository.save(chatRoom)
+
+        // 채팅방 멤버 생성
+        chatRoomMemberRepository.bulkInsertChatRoom(createChatRoomMembers(savedChatRoom.id!!, request.friendIds))
+
+        return ChatRoomIdDto.of(savedChatRoom)
+    }
+
+    private fun createChatRoomMembers(
+        chatRoomId: ObjectId,
+        friendInfos: List<Long>
+    ): MutableList<ChatRoomMember> {
+        val chatRoomMembers = mutableListOf<ChatRoomMember>()
+
+        // 본인을 채팅방 멤버에 추가
+        chatRoomMembers.add(ChatRoomMember.of(chatRoomId, SecurityUtils.getCurrentUserId()))
+
+        // 친구를 채팅방 멤버에 추가
+        friendInfos.forEach { friendInfo ->
+            chatRoomMembers.add(ChatRoomMember.of(chatRoomId, friendInfo))
+        }
+
+        return chatRoomMembers
     }
 }

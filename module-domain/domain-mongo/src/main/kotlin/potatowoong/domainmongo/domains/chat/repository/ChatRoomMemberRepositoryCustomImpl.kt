@@ -17,4 +17,10 @@ class ChatRoomMemberRepositoryCustomImpl(
         val update = Update().set("lastJoinedAt", LocalDateTime.now())
         mongoTemplate.updateFirst(query, update, ChatRoomMember::class.java)
     }
+
+    override fun bulkInsertChatRoom(chatRoomMembers: List<ChatRoomMember>) {
+        chatRoomMembers.isNotEmpty().let {
+            mongoTemplate.insertAll(chatRoomMembers)
+        }
+    }
 }
