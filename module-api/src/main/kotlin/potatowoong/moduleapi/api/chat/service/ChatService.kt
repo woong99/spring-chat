@@ -29,6 +29,7 @@ class ChatService(
 
         // 채팅 내역 조회
         val messages = chatRepository.findMessagesWithPaging(chatRoomId, page)
+        println(messages.size)
 
         // 채팅방 멤버 조회
         val members = chatRoomMemberRepository.findByChatRoomId(chatRoom.id!!)
@@ -36,7 +37,7 @@ class ChatService(
         // 채팅방에 속한 멤버들의 닉네임 조회
         val memberIds = members.map { it.memberId }
         val nicknameMap = memberRepository.findByIdIn(memberIds)
-            .associate { it.id!! to it.nickname }
+            .associateBy { it.id!! }
 
         return ChatDto.Response.of(
             chatRoom = chatRoom,

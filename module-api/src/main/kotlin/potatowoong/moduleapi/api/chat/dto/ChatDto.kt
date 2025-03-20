@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import potatowoong.domainmongo.domains.chat.entity.Chat
 import potatowoong.domainmongo.domains.chat.entity.ChatRoom
 import potatowoong.domainmongo.domains.chat.enums.ChatRoomType
+import potatowoong.domainrdb.domains.auth.entity.Member
 import potatowoong.moduleapi.common.exception.ErrorCode
 import potatowoong.modulecommon.exception.CustomException
 import potatowoong.modulesecurity.utils.SecurityUtils
@@ -21,13 +22,15 @@ class ChatDto {
 
             fun of(
                 chatRoom: ChatRoom,
-                nicknameMap: Map<Long, String>,
+                nicknameMap: Map<Long, Member>,
                 messages: List<Chat>
             ) = Response(
                 chatRoomName = getChatRoomName(chatRoom, nicknameMap),
                 messages = messages.take(50).map {
+                    val member = nicknameMap[it.memberId]
                     Message.of(
-                        nicknameMap[it.memberId] ?: "",
+                        member?.nickname ?: "",
+                        member?.profileImageUrl,
                         it,
                     )
                 },
@@ -39,7 +42,7 @@ class ChatDto {
              */
             private fun getChatRoomName(
                 chatRoom: ChatRoom,
-                nicknameMap: Map<Long, String>
+                nicknameMap: Map<Long, Member>
             ): String {
                 return if (chatRoom.chatRoomType == ChatRoomType.GROUP) { // 그룹 채팅방
                     chatRoom.name ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
@@ -50,7 +53,7 @@ class ChatDto {
                     }
 
                     // 내 정보를 제외한 상대방 닉네임
-                    nicknameMap.filterKeys { it != SecurityUtils.getCurrentUserId() }.values.firstOrNull()
+                    nicknameMap.filterKeys { it != SecurityUtils.getCurrentUserId() }.values.firstOrNull()?.nickname
                         ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
                 }
             }
@@ -60,16 +63,19 @@ class ChatDto {
             val sender: Long,
             val nickname: String,
             val message: String,
+            val profileImageUrl: String?,
             val sendAt: Long,
         ) {
             companion object {
                 fun of(
                     nickname: String,
+                    profileImageUrl: String?,
                     chat: Chat,
                 ) = Message(
                     sender = chat.memberId,
                     nickname = nickname,
                     message = chat.content,
+                    profileImageUrl = profileImageUrl,
                     sendAt = chat.sendAt.toInstant(ZoneOffset.ofHours(9)).toEpochMilli(),
                 )
             }
