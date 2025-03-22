@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*
 import potatowoong.domainmongo.domains.chat.dto.ChatRoomIdDto
 import potatowoong.moduleapi.api.chat.dto.AllChatRoomsDto
 import potatowoong.moduleapi.api.chat.dto.ChatRoomDto
+import potatowoong.moduleapi.api.chat.dto.ChatRoomInfoDto
 import potatowoong.moduleapi.api.chat.service.ChatRoomService
 import potatowoong.moduleapi.common.api.ApiResponse
 
@@ -61,5 +62,15 @@ class ChatRoomController(
         @Valid @RequestBody request: ChatRoomDto.CreateGroupRequest
     ): ResponseEntity<ApiResponse<ChatRoomIdDto>> {
         return ApiResponse.success(chatRoomService.addGroupChatRoom(request))
+    }
+
+    /**
+     * 채팅방 정보 조회 API
+     */
+    @GetMapping("/{chatRoomId}")
+    fun getChatRoomUsers(
+        @PathVariable("chatRoomId") chatRoomId: String
+    ): ResponseEntity<ApiResponse<ChatRoomInfoDto>> {
+        return ApiResponse.success(chatRoomService.getChatRoomUsers(chatRoomId))
     }
 }

@@ -17,7 +17,7 @@ class ChatController(
     @GetMapping("/{chatRoomId}/messages")
     fun getChatList(
         @PathVariable chatRoomId: String,
-        @RequestParam("page", defaultValue = "0") page: Long
+        @RequestParam("page", defaultValue = "0") page: Int
     ): ResponseEntity<ApiResponse<ChatDto.Response>> {
         return ApiResponse.success(chatService.getChatList(chatRoomId, page))
     }

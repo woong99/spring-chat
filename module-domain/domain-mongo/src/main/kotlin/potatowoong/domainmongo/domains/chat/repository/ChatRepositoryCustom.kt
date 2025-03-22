@@ -4,5 +4,5 @@ import potatowoong.domainmongo.domains.chat.entity.Chat
 
 interface ChatRepositoryCustom {
 
-    fun findMessagesWithPaging(chatRoomId: String, page: Long): List<Chat>
+    fun findMessagesWithPaging(chatRoomId: String, page: Int): List<Chat>
 }

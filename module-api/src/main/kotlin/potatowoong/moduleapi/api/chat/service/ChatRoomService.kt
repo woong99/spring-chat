@@ -16,6 +16,7 @@ import potatowoong.domainrdb.domains.auth.repository.MemberRepository
 import potatowoong.domainredis.utils.RedisUtils
 import potatowoong.moduleapi.api.chat.dto.AllChatRoomsDto
 import potatowoong.moduleapi.api.chat.dto.ChatRoomDto
+import potatowoong.moduleapi.api.chat.dto.ChatRoomInfoDto
 import potatowoong.moduleapi.common.exception.ErrorCode
 import potatowoong.modulecommon.exception.CustomException
 import potatowoong.modulesecurity.utils.SecurityUtils
@@ -135,6 +136,25 @@ class ChatRoomService(
         chatRoomMemberRepository.bulkInsertChatRoom(createChatRoomMembers(savedChatRoom.id!!, request.friendIds))
 
         return ChatRoomIdDto.of(savedChatRoom)
+    }
+
+    @Transactional(readOnly = true)
+    fun getChatRoomUsers(
+        chatRoomId: String
+    ): ChatRoomInfoDto {
+        // 채팅방 정보 조회
+        val chatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
+
+        // 채팅방 멤버 조회
+        val chatRoomMembers = chatRoomMemberRepository.findByChatRoomId(chatRoom.id!!)
+        val memberIds = chatRoomMembers
+            .map { it.memberId }
+            .filter { it != SecurityUtils.getCurrentUserId() }
+
+        // 채팅방 멤버 정보 조회
+        val users = memberRepository.findMemberWithFriendshipStatus(memberIds)
+        return ChatRoomInfoDto.of(chatRoom, users)
     }
 
     private fun createChatRoomMembers(

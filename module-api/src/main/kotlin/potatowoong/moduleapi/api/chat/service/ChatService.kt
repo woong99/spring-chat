@@ -21,7 +21,7 @@ class ChatService(
     @Transactional(readOnly = true)
     fun getChatList(
         chatRoomId: String,
-        page: Long
+        page: Int
     ): ChatDto.Response {
         // 채팅방 정보 조회
         val chatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
@@ -29,7 +29,6 @@ class ChatService(
 
         // 채팅 내역 조회
         val messages = chatRepository.findMessagesWithPaging(chatRoomId, page)
-        println(messages.size)
 
         // 채팅방 멤버 조회
         val members = chatRoomMemberRepository.findByChatRoomId(chatRoom.id!!)
@@ -40,9 +39,9 @@ class ChatService(
             .associateBy { it.id!! }
 
         return ChatDto.Response.of(
-            chatRoom = chatRoom,
             nicknameMap = nicknameMap,
-            messages = messages
+            messages = messages,
+            page = page
         )
     }
 }

@@ -3,6 +3,7 @@ package potatowoong.domainrdb.domains.auth.repository
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Projections
 import com.querydsl.jpa.impl.JPAQueryFactory
+import potatowoong.domainrdb.domains.auth.dto.MemberWithFriendshipStatusDto
 import potatowoong.domainrdb.domains.auth.dto.SearchFriendDto
 import potatowoong.domainrdb.domains.auth.entity.QFriendship.friendship
 import potatowoong.domainrdb.domains.auth.entity.QMember.member
@@ -44,6 +45,24 @@ class MemberRepositoryCustomImpl(
             friends = result,
             page = page
         )
+    }
+
+    override fun findMemberWithFriendshipStatus(
+        userIds: List<Long>
+    ): List<MemberWithFriendshipStatusDto> {
+        return queryFactory.select(
+            Projections.constructor(
+                MemberWithFriendshipStatusDto::class.java,
+                member.id,
+                member.nickname,
+                member.profileImageUrl,
+                friendship.friendshipStatus
+            )
+        ).from(member)
+            .leftJoin(friendship)
+            .on(friendship.member.id.eq(SecurityUtils.getCurrentUserId()).and(member.id.eq(friendship.friend.id)))
+            .where(member.id.`in`(userIds))
+            .fetch()
     }
 
     private fun getSearchConditions(
