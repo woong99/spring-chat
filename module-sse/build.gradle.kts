@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":module-common"))
     implementation(project(":module-security"))
     implementation(project(":module-domain:domain-mongo"))
+    implementation(project(":module-domain:domain-rdb"))
     implementation(project(":module-domain:domain-redis"))
 
     // Spring Boot WebFlux

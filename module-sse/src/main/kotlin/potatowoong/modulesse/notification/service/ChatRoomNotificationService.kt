@@ -1,14 +1,21 @@
 package potatowoong.modulesse.notification.service
 
 import org.bson.types.ObjectId
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.stereotype.Service
 import potatowoong.domainmongo.domains.chat.entity.Chat
 import potatowoong.domainmongo.domains.chat.entity.ChatRoomMember
+import potatowoong.domainmongo.domains.chat.enums.ChatRoomType
 import potatowoong.domainmongo.domains.chat.repository.ChatRepository
 import potatowoong.domainmongo.domains.chat.repository.ChatRoomMemberRepository
+import potatowoong.domainmongo.domains.chat.repository.ChatRoomRepository
+import potatowoong.domainrdb.domains.auth.repository.FriendshipRepository
 import potatowoong.domainredis.utils.RedisUtils
+import potatowoong.modulecommon.exception.CustomException
+import potatowoong.modulesse.common.ErrorCode
+import potatowoong.modulesse.notification.dto.NotificationDto
 import potatowoong.modulesse.notification.dto.UnreadMessageCountDto
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
@@ -16,8 +23,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class ChatRoomNotificationService(
+    private val chatRoomRepository: ChatRoomRepository,
     private val chatRepository: ChatRepository,
     private val chatRoomMemberRepository: ChatRoomMemberRepository,
+    private val friendshipRepository: FriendshipRepository,
     private val redisUtils: RedisUtils
 ) {
     private val sinks: MutableMap<Long, Sinks.Many<ServerSentEvent<Any>>> = ConcurrentHashMap()
@@ -44,11 +53,27 @@ class ChatRoomNotificationService(
     }
 
     fun sendUnreadMessageCount(
-        chatRoomId: String,
-        message: String
+        notificationDto: NotificationDto,
     ) {
+        val chatRoomId = notificationDto.chatRoomId
+
+        // 채팅방 정보 조회
+        val chatRoom = chatRoomRepository.findByIdOrNull(chatRoomId)
+            ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
+
         // 채팅방 멤버 정보 조회
         val chatRoomMembers = chatRoomMemberRepository.findByChatRoomId(ObjectId(chatRoomId))
+
+        // 차단된 친구인지 확인
+        var blockedFriendId: Long? = null
+        if (chatRoom.chatRoomType == ChatRoomType.PRIVATE) {
+            val friendId = chatRoomMembers.first { it.memberId != notificationDto.sender }.memberId
+            val friendship = friendshipRepository.findByMemberIdAndFriendId(friendId, notificationDto.sender)
+
+            if (friendship != null && friendship.isBlocked()) {
+                blockedFriendId = friendId
+            }
+        }
 
         // 채팅방 멤버별 Sinks 조회
         val sinks = sinks.filterKeys { chatRoomMembers.any { member -> member.memberId == it } }
@@ -61,13 +86,18 @@ class ChatRoomNotificationService(
         chatRoomMembers.forEach { chatRoomMember ->
             val sink = sinks[chatRoomMember.memberId] ?: return@forEach
 
+            // 차단된 친구인 경우
+            if (blockedFriendId != null) {
+                return@forEach
+            }
+
             sendToClient(
                 sink = sink,
                 event = UNREAD_MESSAGE_COUNT,
                 data = UnreadMessageCountDto(
                     chatRoomId = chatRoomId,
                     unreadMessageCount = calculateUnreadMessageCount(chatRoomMember, chats, chatRoomId),
-                    lastMessage = message,
+                    lastMessage = notificationDto.message,
                     lastSendAt = chats.first().sendAt
                 )
             )

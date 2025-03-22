@@ -42,6 +42,10 @@ class Friendship(
         this.friendshipStatus = friendshipStatus
     }
 
+    fun isBlocked(): Boolean {
+        return friendshipStatus == FriendshipStatus.BLOCKED
+    }
+
     companion object {
         fun of(
             member: Member,

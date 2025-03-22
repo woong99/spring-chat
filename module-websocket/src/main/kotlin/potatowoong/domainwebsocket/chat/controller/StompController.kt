@@ -52,6 +52,7 @@ class StompController(
             KafkaConstants.NOTIFICATION_TOPIC,
             objectMapper.writeValueAsString(
                 NotificationDto.of(
+                    sender = userDetails.id,
                     chatRoomId = chatRoomId,
                     message = request.message
                 )
