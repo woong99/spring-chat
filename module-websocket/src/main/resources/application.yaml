@@ -40,6 +40,23 @@ eureka:
 spring:
   config:
     activate:
+      on-profile: dev
+  kafka:
+    bootstrap-servers: ENC(zqQCJXYAZHqCud3kx4OKkQFDMjiDaYjpdyvPI9dB2HY=)
+    consumer:
+      group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
+logging:
+  config: classpath:log4j2-dev.xml
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+load-balancer-url: ENC(RCmFpVB7zYUSEmo3xOjm3X2K30t/xv0ZTHGIkszKldknOlFi/b+o/ZE2fkwxb+uP)
+
+---
+spring:
+  config:
+    activate:
       on-profile: prod
   kafka:
     bootstrap-servers: ENC(zqQCJXYAZHqCud3kx4OKkQFDMjiDaYjpdyvPI9dB2HY=)
@@ -50,5 +67,5 @@ logging:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-server:8761/eureka
+      defaultZone: ENC(mgnBclbQwQR4Qg+RQl93V0NZcoQpNJtvHTcZPQHcnOHaiINaW16TmRqc5LeAVrdo)
 load-balancer-url: ENC(RCmFpVB7zYUSEmo3xOjm3X2K30t/xv0ZTHGIkszKldknOlFi/b+o/ZE2fkwxb+uP)

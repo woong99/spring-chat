@@ -16,13 +16,13 @@ management:
 cloud:
   aws:
     s3:
-      bucket: spring-10k-chat
+      bucket: potato-chat
       region.static: ENC(eyAxwZTCHN/KiMWbgJmTPZQSnAkCDIa8)
       stack.auto: false
       credentials:
-        access-key: ENC(xXPKI63zuX3jIdWEiDL1j6iGHop4DgPHY4nt8DEniU0=)
-        secret-key: ENC(+1ajM+OvZkkPTPQpkG78NN4ZF39KxyGtlKwhiV6xnsyx+CSN6bVe8F+7z2NDVEzwBTOyu2wa0eI=)
-      url: ENC(eeU7dYD35Y/adW5aDygBUlGybzwQCtEgq7Dc95shULWcfX4r0ffyBiAISNiRQmC3Px8m6qp8OpAcAVldfeZ0oQ==)
+        access-key: ENC(Euo0fKfkIyKwSmWr+UYtfOepuFGuvBdqPoWG17nsVgA=)
+        secret-key: ENC(f14i18CHha0ifgNlkbUE9TC5HHAuRSH/bcmjdpKwnl6XALO0sZ/r5VYezmrBTdWfN6FFkJI8+18=)
+      url: ENC(bApAIZwaT5LDwwX2o+iOr7sZDpcHrdZMJ25MieVb8WgNsHYKug0NIixLmiMkJlZjm411OlsJtkGSYcoXBk5kTQ==)
 file:
   image-extensions: jpg,jpeg,png,heic
   image-size: 5 # MB

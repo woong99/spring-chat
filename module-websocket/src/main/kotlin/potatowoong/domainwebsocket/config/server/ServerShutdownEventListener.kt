@@ -17,7 +17,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 @Component
-@Profile("prod")
+@Profile("dev")
 class ServerShutdownEventListener(
     @Value("\${load-balancer-url}") private val loadBalancerUrl: String,
     @Value("\${deploy}") private val deploy: String,

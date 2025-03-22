@@ -25,6 +25,18 @@ logging:
 spring:
   config:
     activate:
+      on-profile: dev
+  kafka:
+    bootstrap-servers: ENC(Ztjw+261SOpHag+TEEAxpnYxczh99OIunHhyzzkWeMU=)
+    consumer:
+      group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
+logging:
+  config: classpath:log4j2-prod.xml
+
+---
+spring:
+  config:
+    activate:
       on-profile: prod
   kafka:
     bootstrap-servers: ENC(Ztjw+261SOpHag+TEEAxpnYxczh99OIunHhyzzkWeMU=)

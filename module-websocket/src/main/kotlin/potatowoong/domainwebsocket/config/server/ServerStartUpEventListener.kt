@@ -9,9 +9,8 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import potatowoong.domainwebsocket.common.utils.IpUtils
 
-
 @Component
-@Profile("prod")
+@Profile("dev")
 class ServerStartUpEventListener(
     @Value("\${load-balancer-url}") private val loadBalancerUrl: String,
     @Value("\${deploy}") private val deploy: String,

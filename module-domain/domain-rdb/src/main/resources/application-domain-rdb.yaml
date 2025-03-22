@@ -13,9 +13,20 @@ spring:
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://spring-10k-chat-mariadb:3306/spring_chat
+    username: ENC(P1mw77NRdEklo0qiJrh12w==)
+    password: ENC(jBD9AnaTXF8uOEyoYRGNyg==)
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://15.164.220.37:3306/spring_chat
     username: ENC(P1mw77NRdEklo0qiJrh12w==)
     password: ENC(jBD9AnaTXF8uOEyoYRGNyg==)

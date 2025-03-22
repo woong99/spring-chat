@@ -16,10 +16,24 @@ spring:
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
   data:
     mongodb:
       host: mongodb
+      port: 27017
+      database: spring_chat
+      username: ENC(ZIeSB0azmX0DanW+PnxWsQ==)
+      password: ENC(TGTV27qA6G1KCfKf+O25XK3PGUUSkQ/7)
+      authentication-database: admin
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  data:
+    mongodb:
+      host: ENC(ausCau/tT4Q5APe6zSc9vIx/Qr3gIvi3)
       port: 27017
       database: spring_chat
       username: ENC(ZIeSB0azmX0DanW+PnxWsQ==)
