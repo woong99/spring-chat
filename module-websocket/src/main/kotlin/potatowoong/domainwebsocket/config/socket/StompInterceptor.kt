@@ -14,6 +14,7 @@ import potatowoong.domainwebsocket.chat.dto.MessageDto
 import potatowoong.domainwebsocket.chat.enums.ChatCommand
 import potatowoong.domainwebsocket.chat.service.ChatRoomService
 import potatowoong.domainwebsocket.common.exception.ErrorCode
+import potatowoong.domainwebsocket.config.security.StompCustomUserDetails
 import potatowoong.modulecommon.exception.CustomException
 import potatowoong.modulesecurity.auth.jwt.components.JwtTokenProvider
 
@@ -28,13 +29,17 @@ class StompInterceptor(
 
     override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
         val accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor::class.java)
-        try {
-            if (accessor?.command == StompCommand.CONNECT) {
+        when (accessor?.command) {
+            StompCommand.CONNECT -> {
                 // CONNECT 메시지인 경우 토큰을 추출하여 인증 정보를 설정
                 val headers = accessor.getNativeHeader("Authorization")
 
-                accessor.user = getAuthentication(headers)
-            } else if (accessor?.command == StompCommand.SEND) {
+                val authentication = getAuthentication(headers)
+                accessor.user =
+                    StompCustomUserDetails.createStompAuthentication(authentication, accessor.sessionId!!)
+            }
+
+            StompCommand.SEND -> {
                 val messageDto = parseMessageDto(message)
 
                 // DISCONNECT 메시지인 경우 퇴장 처리
@@ -42,17 +47,22 @@ class StompInterceptor(
                     leaveChatRoom(accessor)
                     return null;
                 }
-            } else if (accessor?.command == StompCommand.SUBSCRIBE) {
-                // Global 채널인 경우 처리하지 않음
+            }
+
+            StompCommand.SUBSCRIBE -> {
+                // Global, User 채널인 경우 처리하지 않음
                 val destination = accessor.getNativeHeader("destination")?.get(0)
-                if (destination?.equals("/sub/global") == true) {
+                if (destination?.equals("/sub/global") == true || destination?.startsWith("/user") == true) {
                     return super.preSend(message, channel)
                 }
+
                 // SUBSCRIBE 메시지인 경우 채팅방 입장 처리
                 enterChatRoom(accessor)
             }
-        } catch (e: Exception) {
-            log.error { e }
+
+            else -> {
+                return super.preSend(message, channel)
+            }
         }
 
         return super.preSend(message, channel)
@@ -92,12 +102,13 @@ class StompInterceptor(
     private fun enterChatRoom(accessor: StompHeaderAccessor) {
         val chatRoomId = accessor.getNativeHeader("destination")?.get(0)?.split("/")?.get(2)
             ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
-        val user = accessor.user ?: throw CustomException(ErrorCode.UNAUTHORIZED)
+        val authentication = accessor.getHeader("simpUser") as Authentication
+        val userDetails = authentication.principal as StompCustomUserDetails
 
         chatRoomService.enterChatRoom(
-            user.name.toLong(),
+            userDetails.id,
             chatRoomId,
-            accessor.getHeader("simpSessionId") as String
+            accessor.sessionId!!
         )
     }
 
@@ -107,10 +118,11 @@ class StompInterceptor(
     private fun leaveChatRoom(accessor: StompHeaderAccessor) {
         val chatRoomId = accessor.getNativeHeader("destination")?.get(0)?.split("/")?.get(3)
             ?: throw CustomException(ErrorCode.NOT_FOUND_CHAT_ROOM)
-        val user = accessor.user ?: throw CustomException(ErrorCode.UNAUTHORIZED)
+        val authentication = accessor.getHeader("simpUser") as Authentication
+        val userDetails = authentication.principal as StompCustomUserDetails
 
         chatRoomService.leaveChatRoom(
-            user.name.toLong(),
+            userDetails.id,
             chatRoomId,
             accessor.getHeader("simpSessionId") as String
         )

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.RestController
 import potatowoong.domainwebsocket.chat.dto.MessageDto
@@ -16,7 +17,8 @@ import potatowoong.modulesecurity.auth.data.CustomUserDetails
 class StompController(
     private val kafkaTemplate: KafkaTemplate<String, Any>,
     private val chatService: ChatService,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val simpMessagingTemplate: SimpMessagingTemplate,
 ) {
 
     @MessageMapping("/chat/{chatRoomId}")
@@ -29,11 +31,11 @@ class StompController(
         val userDetails = authentication.principal as CustomUserDetails
 
         // 채팅 저장
-        chatService.saveChat(
-            chatRoomId,
-            request,
-            userDetails.id
-        )
+//        chatService.saveChat(
+//            chatRoomId,
+//            request,
+//            userDetails.id
+//        )
 
         // 메시지 전송
         kafkaTemplate.send(

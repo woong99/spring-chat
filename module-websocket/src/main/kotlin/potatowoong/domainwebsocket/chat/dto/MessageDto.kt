@@ -13,6 +13,11 @@ class MessageDto {
                 message = "SHUTDOWN",
                 type = ChatCommand.SHUTDOWN
             )
+
+            fun createErrorMessage() = Request(
+                message = "ERROR",
+                type = ChatCommand.ERROR
+            )
         }
     }
 
@@ -32,6 +37,16 @@ class MessageDto {
                 sender = userDetails.id,
                 nickname = userDetails.nickname,
                 message = message,
+                sendAt = System.currentTimeMillis(),
+                chatRoomId = chatRoomId
+            )
+
+            fun of(
+                chatRoomId: String
+            ) = Message(
+                sender = 999,
+                nickname = "test",
+                message = "오류",
                 sendAt = System.currentTimeMillis(),
                 chatRoomId = chatRoomId
             )

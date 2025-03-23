@@ -2,7 +2,6 @@ package potatowoong.domainwebsocket.config.socket
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.messaging.Message
-import org.springframework.messaging.MessageDeliveryException
 import org.springframework.messaging.simp.stomp.StompCommand
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.messaging.support.MessageBuilder
@@ -20,10 +19,12 @@ class StompErrorHandler : StompSubProtocolErrorHandler() {
         clientMessage: Message<ByteArray>?,
         ex: Throwable
     ): Message<ByteArray>? {
-        log.error { "handleClientMessageProcessingError: $ex" }
-        if (ex is MessageDeliveryException && ex.cause is CustomException) {
-            return sendErrorMessage((ex.cause as CustomException).errorCode)
+        log.error(ex) { "[WebSocket 오류]" }
+        if (ex.cause is CustomException) {
+            val customException = ex.cause as CustomException
+            return sendErrorMessage(customException.errorCode)
         }
+
         return super.handleClientMessageProcessingError(clientMessage, ex)
     }
 

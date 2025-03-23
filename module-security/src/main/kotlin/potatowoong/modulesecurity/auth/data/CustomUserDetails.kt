@@ -9,6 +9,13 @@ data class CustomUserDetails(
     val nickname: String,
     val authorities: List<SimpleGrantedAuthority>
 ) : UserDetails {
+    var stompSessionId: String? = null
+        private set
+
+    fun initStompSessionId(sessionId: String) {
+        stompSessionId = sessionId
+    }
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return authorities.toMutableList()
     }
