@@ -11,7 +11,7 @@ import potatowoong.domainwebsocket.chat.dto.MessageDto
 import potatowoong.domainwebsocket.chat.dto.NotificationDto
 import potatowoong.domainwebsocket.chat.service.ChatService
 import potatowoong.domainwebsocket.config.kafka.KafkaConstants
-import potatowoong.modulesecurity.auth.data.CustomUserDetails
+import potatowoong.domainwebsocket.config.security.StompCustomUserDetails
 
 @RestController
 class StompController(
@@ -28,14 +28,14 @@ class StompController(
         authentication: Authentication
     ) {
         // 인증 정보
-        val userDetails = authentication.principal as CustomUserDetails
+        val userDetails = authentication.principal as StompCustomUserDetails
 
         // 채팅 저장
-//        chatService.saveChat(
-//            chatRoomId,
-//            request,
-//            userDetails.id
-//        )
+        chatService.saveChat(
+            chatRoomId,
+            request,
+            userDetails.id
+        )
 
         // 메시지 전송
         kafkaTemplate.send(

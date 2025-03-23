@@ -7,14 +7,9 @@ import org.springframework.security.core.userdetails.UserDetails
 data class CustomUserDetails(
     val id: Long,
     val nickname: String,
+    val profileImageUrl: String?,
     val authorities: List<SimpleGrantedAuthority>
 ) : UserDetails {
-    var stompSessionId: String? = null
-        private set
-
-    fun initStompSessionId(sessionId: String) {
-        stompSessionId = sessionId
-    }
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return authorities.toMutableList()

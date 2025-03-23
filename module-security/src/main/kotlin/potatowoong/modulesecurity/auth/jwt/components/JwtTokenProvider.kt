@@ -30,7 +30,8 @@ class JwtTokenProvider(
      */
     fun generateToken(
         authentication: Authentication,
-        nickname: String
+        nickname: String,
+        profileImageUrl: String?
     ): TokenDto {
         val authorities = authentication.authorities.joinToString(",") {
             it.authority
@@ -46,6 +47,7 @@ class JwtTokenProvider(
             .subject(authentication.name)
             .claim("auth", authorities)
             .claim("nickname", nickname)
+            .claim("profileImageUrl", profileImageUrl)
             .expiration(accessTokenExpiresIn)
             .signWith(getSigningKey(), SIG.HS256)
             .compact()
@@ -78,6 +80,7 @@ class JwtTokenProvider(
         val principal = CustomUserDetails(
             claims.subject.toLong(),
             claims["nickname"].toString(),
+            claims["profileImageUrl"]?.toString(),
             authorities
         )
         return UsernamePasswordAuthenticationToken(principal, "", authorities)

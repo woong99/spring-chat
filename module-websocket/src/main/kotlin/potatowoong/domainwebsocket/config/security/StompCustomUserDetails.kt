@@ -11,6 +11,7 @@ data class StompCustomUserDetails(
     val stompSessionId: String,
     val id: Long,
     val nickname: String,
+    val profileImageUrl: String?,
     val authorities: List<SimpleGrantedAuthority>
 ) : UserDetails {
 
@@ -45,6 +46,7 @@ data class StompCustomUserDetails(
                 stompSessionId = stompSessionId,
                 id = principal.id,
                 nickname = principal.nickname,
+                profileImageUrl = principal.profileImageUrl,
                 authorities = principal.authorities
             )
         }
