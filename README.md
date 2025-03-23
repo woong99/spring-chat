@@ -7,34 +7,48 @@
 
 ---
 
+## 🌐 배포 링크
+
+### [Potato Chat](https://www.potato-chat.site/)
+
+### 테스트 계정
+
+- ID : test1, test2 ...
+- PW : 1234
+
+---
+
 ## 🛠️ ️기술 스택
 
 ### Back-end
 
 - Language: Kotlin 1.9.25
 - Framework: Spring Boot 3.4.1, Spring WebFlux
-- DB: MariaDB, MongoDB
+- DB: MariaDB, MongoDB, Redis
 - ORM: JPA, Querydsl
 - WebSocket, STOMP
 - Message Broker: RabbitMQ, Kafka
 
 ### Front-end
 
-- Framework: React
+- React, TypeScript, Vite
 
 ---
 
-## 주요 구현 내용
+## ⭐️ 주요 구현 내용
 
-- 단체 채팅방 생성 및 입장
-- 단체 채팅 기능
 - 로그인/회원가입 기능 With JWT
+- 친구 추가/차단 기능
+- 1대1, 그룹 채팅 기능
+- 채팅방 목록 조회(SSE를 이용한 실시간 갱신)
 
 ---
 
 ## 🎥 Preview
 
-![미리보기](./assets/preview.png)
+![미리보기](./assets/preview1.png)
+![미리보기](./assets/preview2.png)
+
 
 ---
 
@@ -104,6 +118,15 @@
 ### v5.0
 
 - OpenResty, Eureka Server, Jenkins를 통한 웹소켓 서버 Blue/Green 무중단 배포 구현
+
+### v6.0
+
+- Front TS, Vite 적용
+- 운영 서버 배포(AWS)
+- 전체 디자인 변경
+- 친구 관련 API 개발
+- 1대1 채팅, 그룹 채팅 추가
+- 사용자 프로필 이미지 추가
 
 ---
 
