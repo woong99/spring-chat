@@ -19,16 +19,20 @@ eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
-
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+    max-connections: 11000
 ---
 spring:
   config:
     activate:
       on-profile: local
   kafka:
-    bootstrap-servers: ENC(Ztjw+261SOpHag+TEEAxpnYxczh99OIunHhyzzkWeMU=)
+    bootstrap-servers: ENC(+GIxEXQ2SNELyZ8trlJo0vBIBj3m/FxDidWJ5/a7BFfNi9g6w3BrGQ==)
     consumer:
-      group-id: 1
+      group-id: 9999
 logging:
   config: classpath:log4j2-local.xml
 eureka:
@@ -42,7 +46,7 @@ spring:
     activate:
       on-profile: dev
   kafka:
-    bootstrap-servers: ENC(zqQCJXYAZHqCud3kx4OKkQFDMjiDaYjpdyvPI9dB2HY=)
+    bootstrap-servers: ENC(+GIxEXQ2SNELyZ8trlJo0vBIBj3m/FxDidWJ5/a7BFfNi9g6w3BrGQ==)
     consumer:
       group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
 logging:
@@ -59,7 +63,7 @@ spring:
     activate:
       on-profile: prod
   kafka:
-    bootstrap-servers: ENC(zqQCJXYAZHqCud3kx4OKkQFDMjiDaYjpdyvPI9dB2HY=)
+    bootstrap-servers: ENC(8XJzYCkULV3ogLbiVfG0kuTzL3XqUENXRK5+yD1N0rs=)
     consumer:
       group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
 logging:
